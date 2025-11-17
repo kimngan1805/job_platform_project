@@ -3,6 +3,8 @@ import ProductStat from "../models/ProductStat.js";
 import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
 import getCountryIso3 from "country-iso-2-to-3";
+import Company from "../models/Company.js";
+
 
 export const getProducts = async (req, res) => {
   try {
@@ -21,6 +23,19 @@ export const getProducts = async (req, res) => {
     );
 
     res.status(200).json(productsWithStats);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const getCompanies = async (req, res) => {
+  try {
+    // Chỉ cần tìm và trả về tất cả các công ty
+    // Mọi thông tin cần thiết (isVerified, isBanned, description, email...)
+    // đã được nhúng trong schema Company
+    const companies = await Company.find();
+
+    res.status(200).json(companies);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

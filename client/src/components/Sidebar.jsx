@@ -36,42 +36,58 @@ import profileImage from "assets/profile.jpeg";
 const navItems = [
   {
     text: "Trang Chủ",
+    route: "dasboard",
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Quản Lý Chung",
     icon: null,
   },
   {
-    text: "Quản Lý công ty",
+    text: "Quản Lý Công Ty",
+    route: "companies", // Đổi từ 'products'
     icon: <ShoppingCartOutlined />,
   },
   {
-    text: "Quản lý người dùng",
-    icon: <Groups2Outlined />,
-  },
-  {
-    text: "Quản lý bài đăng",
+    text: "Công Ty Bị Cấm",
+    route: "manage-banned-companies",
     icon: <ReceiptLongOutlined />,
   },
   {
-    text: "Geography",
+    text: "Xác Thực Công Ty",
+    route: "review-company-verification",
+    icon: <Groups2Outlined />,
+  },
+  {
+    text: "Quản Lý Người Dùng",
+    route: "users", // Đổi từ 'customers'
+    icon: <Groups2Outlined />,
+  },
+  {
+    text: "Quản lý Bài Đăng",
+    route: "posts", // Đổi từ 'transactions'
+    icon: <ReceiptLongOutlined />,
+  },
+  {
+    text: "Bản đồ",
+    route: "geography",
     icon: <PublicOutlined />,
   },
   {
-    text: "Sales",
+    text: "Thống Kê",
     icon: null,
   },
   {
-    text: "Overview",
+    text: "Chung",
+    route: "stats-user-interaction",
     icon: <PointOfSaleOutlined />,
   },
   {
-    text: "Daily",
+    text: "Hàng ngày",
     icon: <TodayOutlined />,
   },
   {
-    text: "Monthly",
+    text: "Hàng tháng",
     icon: <CalendarMonthOutlined />,
   },
   {
@@ -79,7 +95,7 @@ const navItems = [
     icon: <PieChartOutlined />,
   },
   {
-    text: "Management",
+    text: "",
     icon: null,
   },
   {
@@ -143,7 +159,8 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {/* Thêm 'route' vào phần destructuring */}
+              {navItems.map(({ text, route, icon }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>
@@ -151,7 +168,7 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                const lcText =route || text.toLowerCase();
 
                 return (
                   <ListItem key={text} disablePadding>

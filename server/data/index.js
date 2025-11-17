@@ -22976,3 +22976,62 @@ export const dataUser = [
     role: "admin",
   },
 ];
+export const dataCompanies = [
+  {
+    // Công ty 1: Đã được xác thực, hoạt động bình thường
+    name: "Cổng Thông Tin Công Nghệ TechHub",
+    description: "Công ty cung cấp giải pháp công nghệ và dịch vụ phần mềm hàng đầu Việt Nam.",
+    email: "contact@techhub.vn",
+    address: "Tầng 10, Tòa nhà Sông Đà, Hà Nội",
+    industry: "Công Nghệ Thông Tin",
+    website: "https://www.techhub.vn",
+    status: "Verified", // *** Đã thêm Status ***
+    isVerified: true,
+    isBanned: false,
+    userOwner: "63701cc1f03239c72c000100", // Placeholder User ID
+  },
+  {
+    // Công ty 2: Chưa được xác thực, hoạt động bình thường
+    name: "Tập Đoàn Dịch Vụ Logistics Toàn Cầu",
+    description: "Cung cấp các giải pháp vận chuyển, kho bãi và chuỗi cung ứng quốc tế.",
+    email: "info@globalog.com",
+    address: "Khu Công Nghiệp Sóng Thần, Bình Dương",
+    industry: "Logistics",
+    website: "https://www.globalog.com",
+    status: "Pending", // *** Đã thêm Status ***
+    isVerified: false,
+    isBanned: false,
+    userOwner: "63701cc1f03239c72c000101", // Placeholder User ID
+  },
+  {
+    // Công ty 3: Đã bị cấm (Banned)
+    name: "Dự Án Đầu Tư Lừa Đảo",
+    description: "Cung cấp các cơ hội đầu tư tài chính sinh lời cao, nhưng vi phạm chính sách nền tảng.",
+    email: "scam.invest@mail.com",
+    address: "Quận 1, TP Hồ Chí Minh",
+    industry: "Tài Chính",
+    website: "https://www.scaminvest.net",
+    status: "Banned", // *** Đã thêm Status ***
+    isVerified: false,
+    isBanned: true,
+    bannedDetails: {
+      reason: "Hoạt động kinh doanh lừa đảo, vi phạm pháp luật và chính sách hệ thống.",
+      adminId: "63701cc1f03239c72c000050", // Placeholder Admin User ID
+      banDate: new Date("2025-05-15T10:00:00Z"),
+    },
+    userOwner: "63701cc1f03239c72c000102", // Placeholder User ID
+  },
+  {
+    // Công ty 4: Đang chờ xác thực (Pending Verification)
+    name: "Công ty Xây dựng và Phát triển Hạ tầng",
+    description: "Chuyên về xây dựng các công trình dân dụng và công nghiệp.",
+    email: "contact@infra.vn",
+    address: "Đà Nẵng",
+    industry: "Xây Dựng",
+    website: "https://www.infradev.vn",
+    status: "Pending", // *** Đã thêm Status ***
+    isVerified: false, 
+    isBanned: false,
+    userOwner: "63701cc1f03239c72c000103", // Placeholder User ID
+  },
+];
