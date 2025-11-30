@@ -17305,7 +17305,8 @@ export const dataTransaction = [
     ],
   },
 ];
-
+// mẫu user
+/*
 export const dataUser = [
   {
     _id: "63701cc1f03239c72c00017f",
@@ -22976,6 +22977,9 @@ export const dataUser = [
     role: "admin",
   },
 ];
+*/
+// mẫu công ty
+/*
 export const dataCompanies = [
   {
     // Công ty 1: Đã được xác thực, hoạt động bình thường
@@ -23035,3 +23039,217 @@ export const dataCompanies = [
     userOwner: "63701cc1f03239c72c000103", // Placeholder User ID
   },
 ];
+*/
+
+/*
+const generateObjectId = () => {
+  const hexDigits = '0123456789abcdef';
+  let objectId = '';
+  for (let i = 0; i < 24; i++) {
+    objectId += hexDigits[Math.floor(Math.random() * 16)];
+  }
+  return objectId;
+};
+
+const industries = [
+  'Công Nghệ Thông Tin',
+  'Tài Chính',
+  'Giáo Dục',
+  'Sản Xuất',
+  'Bán Lẻ',
+  'Y Tế',
+  'Bất Động Sản',
+  'Logistics',
+  'Marketing & Truyền Thông',
+  'Xây Dựng',
+];
+
+const mockCompanies = [];
+const baseAdminId = generateObjectId(); // ID admin giả chung
+let ownerIdCounter = 105; // Bắt đầu từ ID tiếp theo sau ví dụ của bạn
+
+for (let i = 1; i <= 50; i++) {
+  const companyNumber = i.toString().padStart(2, '0');
+  const industry = industries[i % industries.length];
+  
+  let status = 'Pending';
+  if (i % 5 === 0) status = 'Verified'; // 10 công ty Verified (5, 10, 15, ...)
+  if (i % 7 === 0) status = 'Banned';   // 7 công ty Banned (7, 14, 21, ...)
+  if (i % 11 === 0) status = 'Deleted';  // 4 công ty Deleted (11, 22, 33, 44)
+  
+  // Ưu tiên Banned và Deleted nếu trùng lặp
+  if (i % 7 === 0) status = 'Banned';
+  if (i % 11 === 0) status = 'Deleted';
+
+
+  const isVerified = status === 'Verified';
+  const isBanned = status === 'Banned';
+  
+  const company = {
+    // Trường cơ bản
+    name: `Công ty ${industry} Phát triển ${companyNumber}`,
+    description: `Công ty chuyên cung cấp giải pháp, sản phẩm hàng đầu trong lĩnh vực ${industry}.`,
+    email: `info.dev${companyNumber}@${industry.toLowerCase().replace(/\s/g, '')}.vn`,
+    address: `${i * 10} Đường Lạc Long Quân, Quận ${i % 10 + 1}, TP. Hồ Chí Minh`,
+    industry: industry,
+    website: `https://www.dev${companyNumber}${industry.toLowerCase().replace(/\s/g, '')}.com`,
+    status: status,
+    
+    // Trường quản lý
+    isVerified: isVerified,
+    isBanned: isBanned,
+
+    // Liên kết
+    userOwner: generateObjectId(), 
+  };
+  
+  // Thêm chi tiết lệnh cấm nếu status là Banned
+  if (isBanned) {
+    company.bannedDetails = {
+      reason: i % 2 === 0 ? 'Vi phạm nghiêm trọng chính sách nội dung.' : 'Hoạt động kinh doanh không minh bạch.',
+      adminId: baseAdminId,
+      banDate: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000), // Bị cấm ngẫu nhiên trong 3 tháng qua
+    };
+  }
+
+  mockCompanies.push(company);
+  ownerIdCounter++;
+}
+
+export const dataCompanies = mockCompanies;
+*/
+
+const generateObjectId = () => {
+  const hexDigits = '0123456789abcdef';
+  let objectId = '';
+  for (let i = 0; i < 24; i++) {
+    objectId += hexDigits[Math.floor(Math.random() * 16)];
+  }
+  return objectId;
+};
+
+const generateRandomPassword = () => {
+    return Math.random().toString(36).slice(-8);
+};
+
+const industries = [
+  'Công Nghệ Thông Tin', 'Tài Chính', 'Giáo Dục', 'Sản Xuất', 'Bán Lẻ',
+  'Y Tế', 'Bất Động Sản', 'Logistics', 'Marketing & Truyền Thông', 'Xây Dựng',
+];
+
+// --- KHỞI TẠO ARRAYS CHÍNH ---
+export const dataUser = [];
+export const dataCompanies = [];
+
+// --- DỮ LIỆU ĐỊNH DANH CẦN THIẾT ---
+const NUM_EMPLOYERS = 50; // <--- ĐÃ THAY ĐỔI: 50
+const NUM_COMPANIES = 50; // <--- ĐÃ THAY ĐỔI: 50
+const employerUserIds = []; // Chứa ID của 50 employers
+const companyIds = []; // Chứa ID của 50 công ty
+
+// --- BƯỚC 1: TẠO 50 EMPLOYER USERS & LƯU ID ---
+for (let i = 1; i <= NUM_EMPLOYERS; i++) {
+    const userId = generateObjectId();
+    employerUserIds.push(userId); // Lưu ID để dùng cho Company
+
+    const employerData = {
+        _id: userId,
+        name: `Nhà Tuyển Dụng Lãnh Đạo ${i.toString().padStart(2, '0')}`,
+        email: `leader.employer${i}@company${i}.com`,
+        password: generateRandomPassword(), 
+        role: "employer",
+        // Đặt một số user bị banned/inactive
+        status: (i % 5 === 0) ? "inactive" : ((i % 7 === 0) ? "banned" : "active"), 
+        // companyRef sẽ được điền ở Bước 3
+    };
+    dataUser.push(employerData);
+}
+
+// --- BƯỚC 2: TẠO 50 CÔNG TY & LIÊN KẾT CHẶT CHẼ VỚI 50 EMPLOYER ---
+for (let i = 1; i <= NUM_COMPANIES; i++) {
+    const companyId = generateObjectId();
+    companyIds.push(companyId); // Lưu ID để dùng cho User
+
+    const industry = industries[i % industries.length];
+    
+    // Logic xác định Status (giữ nguyên để đảm bảo đa dạng)
+    let status = 'Pending';
+    if (i % 5 === 0) status = 'Verified'; 
+    if (i % 7 === 0) status = 'Banned';   
+
+    const isVerified = status === 'Verified';
+    const isBanned = status === 'Banned';
+
+    // Xác định chủ sở hữu (userOwner): CÔNG TY i LUÔN SỞ HỮU BỞI EMPLOYER i
+    const ownerId = employerUserIds[i - 1]; 
+
+    const company = {
+        _id: companyId,
+        name: `Công ty ${industry} Phát triển ${i.toString().padStart(2, '0')}`,
+        description: `Giải pháp hàng đầu trong lĩnh vực ${industry}.`,
+        email: `info.dev${i.toString().padStart(2, '0')}@${industry.toLowerCase().replace(/\s/g, '')}.vn`,
+        address: `${i * 10} Đường Lạc Long Quân, Quận ${i % 10 + 1}, TP. Hồ Chí Minh`,
+        industry: industry,
+        website: `https://www.dev${i.toString().padStart(2, '0')}${industry.toLowerCase().replace(/\s/g, '')}.com`,
+        status: status,
+        isVerified: isVerified,
+        isBanned: isBanned,
+        userOwner: ownerId, // <--- LIÊN KẾT TỪ COMPANY ĐẾN USER
+    };
+
+    if (isBanned) {
+        company.bannedDetails = {
+            reason: i % 2 === 0 ? 'Vi phạm nghiêm trọng chính sách nội dung.' : 'Hoạt động kinh doanh không minh bạch.',
+            adminId: generateObjectId(),
+            banDate: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000),
+        };
+    }
+    dataCompanies.push(company);
+}
+
+// --- BƯỚC 3: CẬP NHẬT 50 EMPLOYER USERS VỚI companyRef ---
+// dataUser[i] là employer, dataCompanies[i] là công ty họ sở hữu
+for (let i = 0; i < NUM_EMPLOYERS; i++) {
+    dataUser[i].companyRef = companyIds[i]; // <--- LIÊN KẾT TỪ USER ĐẾN COMPANY
+}
+
+// --- BƯỚC 4: TẠO ADMINS VÀ JOBSEEKERS CÒN LẠI ---
+// ADMINS (2 tài khoản - tổng 52 Users)
+    dataUser.push({
+        _id: generateObjectId(),
+        name: `Nguyen Hong`,
+        email: `admin@gmail.com`,
+        password: '123456',
+        role: "admin",
+        status: "active",
+    });
+
+// JOBSEEKERS (12 tài khoản - tổng 64 Users)
+for (let i = 1; i <= 12; i++) {
+    dataUser.push({
+        _id: generateObjectId(),
+        name: `Ứng Viên ${i}`,
+        email: `jobseeker${i}@mail.com`,
+        password: generateRandomPassword(),
+        role: "jobseeker",
+        status: (i === 10) ? "inactive" : "active", 
+        profileRef: generateObjectId(), // Giả định ID Profile
+    });
+}
+
+export const dataJobPost = [
+  {
+    title: "Chuyên viên Phân tích Dữ liệu (Senior Data Analyst)",
+    companyRef: "2258706c1a7c702bc0f1d3ce",
+    postedByRef: "fc5e813dc99bdabd0327444d",
+    location: "TP. Hồ Chí Minh",
+    salary: { min: 1500, max: 2500, currency: "USD" },
+    industry: "Công nghệ Thông tin",
+    experienceRequired: "3-5 năm",
+    description: "Phân tích và xây dựng mô hình dữ liệu để hỗ trợ quyết định kinh doanh.",
+    status: "approved", // Tin đã được duyệt
+    viewsCount: 150,
+    applicantsCount: 12,
+    expirationDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) // Hết hạn sau 60 ngày
+  },
+]

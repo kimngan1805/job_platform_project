@@ -17,7 +17,8 @@ const CompanySchema = new mongoose.Schema(
     website: String,
     status: {
       type: String,
-      enum: ['Pending', 'Verified', 'Banned', 'Deleted'],
+      enum: ['Pending', 'Verified', 'Banned'],
+      // enum: ["pending", "approved", "rejected"],
       default: 'Pending',
     },
     
@@ -35,6 +36,7 @@ const CompanySchema = new mongoose.Schema(
       adminId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        // required: true,
       },
       banDate: Date,
     },
@@ -43,6 +45,7 @@ const CompanySchema = new mongoose.Schema(
     userOwner: { // Chủ sở hữu hoặc tài khoản quản trị công ty
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
   },
   { timestamps: true }

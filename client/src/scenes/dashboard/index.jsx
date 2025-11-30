@@ -1,206 +1,242 @@
 import React from "react";
-import FlexBetween from "components/FlexBetween";
-import Header from "components/Header";
-import {
-  DownloadOutlined,
-  Email,
-  PointOfSale,
-  PersonAdd,
-  Traffic,
-} from "@mui/icons-material";
 import {
   Box,
-  Button,
-  Typography,
   useTheme,
   useMediaQuery,
+  Typography,
+  Button,
+  Chip,
+  Paper,
+  alpha,
+  LinearProgress,
+  Stack,
 } from "@mui/material";
+import {
+  Groups,
+  Business,
+  Work,
+  CheckCircle,
+  HourglassEmpty,
+  TrendingUp,
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
-import BreakdownChart from "components/BreakdownChart";
-import OverviewChart from "components/OverviewChart";
+
 import { useGetDashboardQuery } from "state/api";
+import Header from "components/Header";
 import StatBox from "components/StatBox";
+import FlexBetween from "components/FlexBetween";
+import OverviewChart from "components/OverviewChart";
 
 const Dashboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const { data, isLoading } = useGetDashboardQuery();
+  const stats = data || {};
 
-  const columns = [
+  const statBoxes = [
     {
-      field: "_id",
-      headerName: "ID",
-      flex: 1,
+      title: "Tổng Người Dùng",
+      value: stats.totalUsers || 0,
+      increase: `+${stats.newUsersThisMonth || 0} tháng này`,
+      icon: <Groups fontSize="large" />,
+      color: theme.palette.primary.main,
+      link: "/users",
     },
     {
-      field: "userId",
-      headerName: "User ID",
-      flex: 1,
+      title: "Công Ty Xác Thực",
+      value: stats.verifiedCompanies || 0,
+      increase: `${stats.totalCompanies || 0} công ty đăng ký`,
+      icon: <Business fontSize="large" />,
+      color: theme.palette.success.main,
+      link: "/companies",
     },
+    {
+      title: "Tin Đăng Chờ Duyệt",
+      value: stats.pendingJobPosts || 0,
+      increase: "Cần xử lý ngay",
+      icon: <HourglassEmpty fontSize="large" />,
+      color: theme.palette.warning.main,
+      link: "/jobposts",
+    },
+    {
+      title: "Tin Đăng Hoạt Động",
+      value: stats.approvedJobPosts || 0,
+      increase: "Đang hiển thị",
+      icon: <CheckCircle fontSize="large" />,
+      color: theme.palette.info.main,
+      link: "/jobposts",
+    },
+  ];
+
+  const recentPostsColumns = [
+    { field: "title", headerName: "Tiêu đề", flex: 2 },
+    {
+      field: "companyName",
+      headerName: "Công ty",
+      flex: 1.2,
+      valueGetter: (p) => p.row.companyRef?.name || "Chưa xác định",
+    },
+    {
+      field: "status",
+      headerName: "Trạng thái",
+      flex: 0.8,
+      renderCell: (params) => {
+        const map = {
+          pending: { label: "Chờ duyệt", color: "warning" },
+          approved: { label: "Đã duyệt", color: "success" },
+          rejected: { label: "Bị từ chối", color: "error" },
+          closed: { label: "Đã đóng", color: "default" },
+        };
+        const config = map[params.value] || { label: params.value, color: "default" };
+        return <Chip label={config.label} color={config.color} size="small" sx={{ fontWeight: 600 }} />;
+      },
+    },
+    { field: "applicantsCount", headerName: "Ứng tuyển", flex: 0.7, align: "center" },
     {
       field: "createdAt",
-      headerName: "CreatedAt",
+      headerName: "Ngày đăng",
       flex: 1,
-    },
-    {
-      field: "products",
-      headerName: "# of Products",
-      flex: 0.5,
-      sortable: false,
-      renderCell: (params) => params.value.length,
-    },
-    {
-      field: "cost",
-      headerName: "Cost",
-      flex: 1,
-      renderCell: (params) => `$${Number(params.value).toFixed(2)}`,
+      valueFormatter: (p) => new Date(p.value).toLocaleDateString("vi-VN"),
     },
   ];
 
   return (
-    <Box m="1.5rem 2.5rem">
+    <Box m={{ xs: "1rem", md: "1.5rem 2.5rem" }}>
+      {/* HEADER */}
       <FlexBetween>
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-
-        <Box>
+        <Header
+          title="TỔNG QUAN HỆ THỐNG"
+          subtitle="Chào mừng quay trở lại! Dưới đây là các chỉ số mới nhất."
+        />
+        <Link to="/jobposts">
           <Button
+            variant="contained"
+            size="large"
+            startIcon={<Work />}
             sx={{
-              backgroundColor: theme.palette.secondary.light,
-              color: theme.palette.background.alt,
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
+              bgcolor: theme.palette.primary[600],
+              "&:hover": { bgcolor: theme.palette.primary[700] },
+              fontWeight: 600,
+              textTransform: "none",
+              px: 4,
+              py: 1.5,
+              borderRadius: 3,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
             }}
           >
-            <DownloadOutlined sx={{ mr: "10px" }} />
-            Download Reports
+            Quản Lý Tin Đăng
           </Button>
-        </Box>
+        </Link>
       </FlexBetween>
 
+      {/* 4 STAT BOXES */}
       <Box
-        mt="20px"
+        mt={4}
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="160px"
-        gap="20px"
+        gap={3}
         sx={{
-          "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
+          "& > div": { gridColumn: isNonMediumScreens ? "span 3" : "span 12" },
         }}
       >
-        {/* ROW 1 */}
-        <StatBox
-          title="Total Customers"
-          value={data && data.totalCustomers}
-          increase="+14%"
-          description="Since last month"
-          icon={
-            <Email
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-        />
-        <StatBox
-          title="Sales Today"
-          value={data && data.todayStats.totalSales}
-          increase="+21%"
-          description="Since last month"
-          icon={
-            <PointOfSale
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-        />
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={theme.palette.background.alt}
-          p="1rem"
-          borderRadius="0.55rem"
-        >
-          <OverviewChart view="sales" isDashboard={true} />
-        </Box>
-        <StatBox
-          title="Monthly Sales"
-          value={data && data.thisMonthStats.totalSales}
-          increase="+5%"
-          description="Since last month"
-          icon={
-            <PersonAdd
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-        />
-        <StatBox
-          title="Yearly Sales"
-          value={data && data.yearlySalesTotal}
-          increase="+43%"
-          description="Since last month"
-          icon={
-            <Traffic
-              sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-            />
-          }
-        />
+        {statBoxes.map((box) => (
+          <StatBox key={box.title} {...box} />
+        ))}
+      </Box>
 
-        {/* ROW 2 */}
+      {/* BIỂU ĐỒ LỚN – FULL WIDTH */}
+      <Paper
+        elevation={8}
+        sx={{
+          mt: 4,
+          borderRadius: 4,
+          overflow: "hidden",
+          bgcolor: theme.palette.background.default,
+          boxShadow: `0 12px 40px ${alpha(theme.palette.mode === "dark" ? "#000" : "#000", 0.08)}`,
+        }}
+      >
+        <Box p={3} borderBottom={`1px solid ${theme.palette.divider}`}>
+          <FlexBetween>
+            <Box>
+              <Typography variant="h5" fontWeight={700}>
+                Xu Hướng Tin Tuyển Dụng – 12 Tháng Gần Nhất
+              </Typography>
+              <Stack direction="row" alignItems="center" gap={1} mt={1}>
+                <TrendingUp color="success" />
+                <Typography color="success.main" fontWeight={600}>
+                  +{stats.growthRate || 12}% so với cùng kỳ
+                </Typography>
+              </Stack>
+            </Box>
+          </FlexBetween>
+        </Box>
+
+        <Box height={480} position="relative">
+          {isLoading ? (
+            <LinearProgress sx={{ height: 6, borderRadius: 3 }} />
+          ) : (
+            <OverviewChart
+              data={stats.monthlyJobPostStats || []}
+              isDashboard={true}
+            />
+          )}
+        </Box>
+      </Paper>
+
+      {/* BẢNG 5 BÀI ĐĂNG MỚI NHẤT – NẰM PHÍA DƯỚI BIỂU ĐỒ */}
+      <Paper
+        elevation={8}
+        sx={{
+          mt: 4,
+          borderRadius: 4,
+          overflow: "hidden",
+          boxShadow: `0 12px 40px ${alpha(theme.palette.mode === "dark" ? "#000" : "#000", 0.08)}`,
+        }}
+      >
         <Box
-          gridColumn="span 8"
-          gridRow="span 3"
-          sx={{
-            "& .MuiDataGrid-root": {
-              border: "none",
-              borderRadius: "5rem",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: theme.palette.background.alt,
-              color: theme.palette.secondary[100],
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: theme.palette.background.alt,
-            },
-            "& .MuiDataGrid-footerContainer": {
-              backgroundColor: theme.palette.background.alt,
-              color: theme.palette.secondary[100],
-              borderTop: "none",
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${theme.palette.secondary[200]} !important`,
-            },
-          }}
+          p={3}
+          borderBottom={`1px solid ${theme.palette.divider}`}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
         >
+          <Typography variant="h5" fontWeight={700}>
+            5 Bài Đăng Mới Nhất
+          </Typography>
+          <Link to="/jobposts">
+            <Button variant="text" color="primary" endIcon="→">
+              Xem tất cả
+            </Button>
+          </Link>
+        </Box>
+
+        <Box height={520}>
           <DataGrid
-            loading={isLoading || !data}
+            loading={isLoading}
+            rows={stats.recentJobPosts || []}
+            columns={recentPostsColumns}
             getRowId={(row) => row._id}
-            rows={(data && data.transactions) || []}
-            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5]}
+            hideFooter
+            disableSelectionOnClick
+            sx={{
+              border: "none",
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: alpha(theme.palette.primary.main, 0.05),
+                fontWeight: 600,
+              },
+              "& .MuiDataGrid-row:hover": {
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              },
+              "& .MuiDataGrid-cell": {
+                py: 2,
+              },
+            }}
           />
         </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 3"
-          backgroundColor={theme.palette.background.alt}
-          p="1.5rem"
-          borderRadius="0.55rem"
-        >
-          <Typography variant="h6" sx={{ color: theme.palette.secondary[100] }}>
-            Sales By Category
-          </Typography>
-          <BreakdownChart isDashboard={true} />
-          <Typography
-            p="0 0.6rem"
-            fontSize="0.8rem"
-            sx={{ color: theme.palette.secondary[200] }}
-          >
-            Breakdown of real states and information via category for revenue
-            made for this year and total sales.
-          </Typography>
-        </Box>
-      </Box>
+      </Paper>
     </Box>
   );
 };

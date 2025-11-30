@@ -11,6 +11,7 @@ import {
   ListItemText,
   Typography,
   useTheme,
+  alpha,
 } from "@mui/material";
 import {
   SettingsOutlined,
@@ -20,13 +21,8 @@ import {
   ShoppingCartOutlined,
   Groups2Outlined,
   ReceiptLongOutlined,
-  PublicOutlined,
-  PointOfSaleOutlined,
-  TodayOutlined,
-  CalendarMonthOutlined,
   AdminPanelSettingsOutlined,
-  TrendingUpOutlined,
-  PieChartOutlined,
+
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -36,7 +32,7 @@ import profileImage from "assets/profile.jpeg";
 const navItems = [
   {
     text: "Trang Chủ",
-    route: "dasboard",
+    route: "dashboard",
     icon: <HomeOutlined />,
   },
   {
@@ -45,7 +41,7 @@ const navItems = [
   },
   {
     text: "Quản Lý Công Ty",
-    route: "companies", // Đổi từ 'products'
+    route: "companies",
     icon: <ShoppingCartOutlined />,
   },
   {
@@ -60,40 +56,15 @@ const navItems = [
   },
   {
     text: "Quản Lý Người Dùng",
-    route: "users", // Đổi từ 'customers'
+    route: "users",
     icon: <Groups2Outlined />,
   },
   {
     text: "Quản lý Bài Đăng",
-    route: "posts", // Đổi từ 'transactions'
+    route: "jobposts",
     icon: <ReceiptLongOutlined />,
   },
-  {
-    text: "Bản đồ",
-    route: "geography",
-    icon: <PublicOutlined />,
-  },
-  {
-    text: "Thống Kê",
-    icon: null,
-  },
-  {
-    text: "Chung",
-    route: "stats-user-interaction",
-    icon: <PointOfSaleOutlined />,
-  },
-  {
-    text: "Hàng ngày",
-    icon: <TodayOutlined />,
-  },
-  {
-    text: "Hàng tháng",
-    icon: <CalendarMonthOutlined />,
-  },
-  {
-    text: "Breakdown",
-    icon: <PieChartOutlined />,
-  },
+ 
   {
     text: "",
     icon: null,
@@ -102,10 +73,7 @@ const navItems = [
     text: "Admin",
     icon: <AdminPanelSettingsOutlined />,
   },
-  {
-    text: "Performance",
-    icon: <TrendingUpOutlined />,
-  },
+ 
 ];
 
 const Sidebar = ({
@@ -137,113 +105,230 @@ const Sidebar = ({
             "& .MuiDrawer-paper": {
               color: theme.palette.secondary[200],
               backgroundColor: theme.palette.background.alt,
-              boxSixing: "border-box",
+              boxSizing: "border-box",
               borderWidth: isNonMobile ? 0 : "2px",
               width: drawerWidth,
+              boxShadow: isNonMobile ? "4px 0 20px rgba(0,0,0,0.08)" : "none",
             },
           }}
         >
-          <Box width="100%">
-            <Box m="1.5rem 2rem 2rem 3rem">
+          <Box width="100%" height="100%" display="flex" flexDirection="column">
+            {/* Header Section */}
+            <Box m="1.5rem 2rem 1.5rem 2rem">
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    ECOMVISION
+                  <Box
+                    sx={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "10px",
+                      background: `linear-gradient(135deg, ${theme.palette.primary[400]} 0%, ${theme.palette.primary[600]} 100%)`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow: `0 4px 12px ${alpha(theme.palette.primary[400], 0.3)}`,
+                    }}
+                  >
+                    <Typography variant="h5" fontWeight="bold" color="white">
+                      E
+                    </Typography>
+                  </Box>
+                  <Typography 
+                    variant="h4" 
+                    fontWeight="bold"
+                    sx={{
+                      background: `linear-gradient(135deg, ${theme.palette.primary[400]} 0%, ${theme.palette.primary[600]} 100%)`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    JobStreet
                   </Typography>
                 </Box>
                 {!isNonMobile && (
-                  <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                  <IconButton 
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: alpha(theme.palette.primary[400], 0.1),
+                      }
+                    }}
+                  >
                     <ChevronLeft />
                   </IconButton>
                 )}
               </FlexBetween>
             </Box>
-            <List>
-              {/* Thêm 'route' vào phần destructuring */}
-              {navItems.map(({ text, route, icon }) => {
-                if (!icon) {
-                  return (
-                    <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>
-                      {text}
-                    </Typography>
-                  );
-                }
-                const lcText =route || text.toLowerCase();
 
-                return (
-                  <ListItem key={text} disablePadding>
-                    <ListItemButton
-                      onClick={() => {
-                        navigate(`/${lcText}`);
-                        setActive(lcText);
-                      }}
-                      sx={{
-                        backgroundColor:
-                          active === lcText
-                            ? theme.palette.secondary[300]
-                            : "transparent",
-                        color:
-                          active === lcText
-                            ? theme.palette.primary[600]
-                            : theme.palette.secondary[100],
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          ml: "2rem",
-                          color:
-                            active === lcText
-                              ? theme.palette.primary[600]
-                              : theme.palette.secondary[200],
+            <Divider sx={{ mx: 2, opacity: 0.6 }} />
+
+            {/* Navigation List */}
+            <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden", mt: 1 }}>
+              <List sx={{ px: 1.5 }}>
+                {navItems.map(({ text, route, icon }) => {
+                  if (!icon) {
+                    return (
+                      <Typography 
+                        key={text} 
+                        sx={{ 
+                          m: "1.5rem 0 0.75rem 1.5rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          letterSpacing: "1px",
+                          color: alpha(theme.palette.secondary[200], 0.6),
                         }}
                       >
-                        {icon}
-                      </ListItemIcon>
-                      <ListItemText primary={text} />
-                      {active === lcText && (
-                        <ChevronRightOutlined sx={{ ml: "auto" }} />
-                      )}
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-          </Box>
+                        {text}
+                      </Typography>
+                    );
+                  }
+                  const lcText = route || text.toLowerCase();
 
-          <Box position="absolute" bottom="2rem">
-            <Divider />
-            <FlexBetween textTransform="none" gap="1rem" m="1.5rem 2rem 0 3rem">
-              <Box
-                component="img"
-                alt="profile"
-                src={profileImage}
-                height="40px"
-                width="40px"
-                borderRadius="50%"
-                sx={{ objectFit: "cover" }}
-              />
-              <Box textAlign="left">
-                <Typography
-                  fontWeight="bold"
-                  fontSize="0.9rem"
-                  sx={{ color: theme.palette.secondary[100] }}
-                >
-                  {user.name}
-                </Typography>
-                <Typography
-                  fontSize="0.8rem"
-                  sx={{ color: theme.palette.secondary[200] }}
-                >
-                  {user.occupation}
-                </Typography>
-              </Box>
-              <SettingsOutlined
+                  return (
+                    <ListItem key={text} disablePadding sx={{ mb: 0.5 }}>
+                      <ListItemButton
+                        onClick={() => {
+                          navigate(`/${lcText}`);
+                          setActive(lcText);
+                        }}
+                        sx={{
+                          borderRadius: "12px",
+                          backgroundColor:
+                            active === lcText
+                              ? alpha(theme.palette.primary[400], 0.15)
+                              : "transparent",
+                          color:
+                            active === lcText
+                              ? theme.palette.primary[500]
+                              : theme.palette.secondary[100],
+                          transition: "all 0.2s ease-in-out",
+                          py: 1.2,
+                          px: 1.5,
+                          position: "relative",
+                          overflow: "hidden",
+                          "&:hover": {
+                            backgroundColor: 
+                              active === lcText
+                                ? alpha(theme.palette.primary[400], 0.2)
+                                : alpha(theme.palette.secondary[300], 0.08),
+                            transform: "translateX(4px)",
+                          },
+                          "&::before": active === lcText ? {
+                            content: '""',
+                            position: "absolute",
+                            left: 0,
+                            top: "20%",
+                            bottom: "20%",
+                            width: "4px",
+                            borderRadius: "0 4px 4px 0",
+                            background: `linear-gradient(180deg, ${theme.palette.primary[400]} 0%, ${theme.palette.primary[600]} 100%)`,
+                          } : {},
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: "40px",
+                            color:
+                              active === lcText
+                                ? theme.palette.primary[500]
+                                : theme.palette.secondary[200],
+                            transition: "color 0.2s ease-in-out",
+                          }}
+                        >
+                          {icon}
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={text}
+                          primaryTypographyProps={{
+                            fontSize: "0.9rem",
+                            fontWeight: active === lcText ? 600 : 500,
+                          }}
+                        />
+                        {active === lcText && (
+                          <ChevronRightOutlined 
+                            sx={{ 
+                              ml: "auto",
+                              fontSize: "1.2rem",
+                            }} 
+                          />
+                        )}
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Box>
+
+            {/* Profile Section */}
+            <Box sx={{ mt: "auto" }}>
+              <Divider sx={{ mx: 2, opacity: 0.6 }} />
+              <Box 
                 sx={{
-                  color: theme.palette.secondary[300],
-                  fontSize: "25px ",
+                  m: "1.5rem 1.5rem 1.5rem 1.5rem",
+                  p: 1.5,
+                  borderRadius: "12px",
+                  backgroundColor: alpha(theme.palette.primary[400], 0.08),
+                  border: `1px solid ${alpha(theme.palette.primary[400], 0.15)}`,
+                  transition: "all 0.2s ease-in-out",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary[400], 0.12),
+                    transform: "translateY(-2px)",
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary[400], 0.15)}`,
+                  }
                 }}
-              />
-            </FlexBetween>
+              >
+                <FlexBetween textTransform="none" gap="1rem">
+                  <Box
+                    component="img"
+                    alt="profile"
+                    src={profileImage}
+                    height="44px"
+                    width="44px"
+                    borderRadius="12px"
+                    sx={{ 
+                      objectFit: "cover",
+                      border: `2px solid ${alpha(theme.palette.primary[400], 0.3)}`,
+                    }}
+                  />
+                  <Box textAlign="left" flex={1}>
+                    <Typography
+                      fontWeight="bold"
+                      fontSize="0.95rem"
+                      sx={{ 
+                        color: theme.palette.secondary[100],
+                        mb: 0.25,
+                      }}
+                    >
+                      {user.name || "ADMIN"}
+                    </Typography>
+                    <Typography
+                      fontSize="0.8rem"
+                      sx={{ 
+                        color: alpha(theme.palette.secondary[200], 0.8),
+                      }}
+                    >
+                      {user.occupation || "admin"}
+                    </Typography>
+                  </Box>
+                  <IconButton 
+                    size="small"
+                    sx={{
+                      color: theme.palette.secondary[300],
+                      "&:hover": {
+                        backgroundColor: alpha(theme.palette.primary[400], 0.1),
+                        transform: "rotate(90deg)",
+                        transition: "transform 0.3s ease-in-out",
+                      }
+                    }}
+                  >
+                    <SettingsOutlined fontSize="small" />
+                  </IconButton>
+                </FlexBetween>
+              </Box>
+            </Box>
           </Box>
         </Drawer>
       )}

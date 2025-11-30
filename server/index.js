@@ -8,26 +8,17 @@ import morgan from "morgan";
 import clientRoutes from "./routes/client.js";
 import generalRoutes from "./routes/general.js";
 import managementRoutes from "./routes/management.js";
-import salesRoutes from "./routes/sales.js";
-
 import bannedCompanyRoutes from "./routes/bannedcompany.js"; // Thêm dòng này
 
 // data imports
 import User from "./models/User.js";
-import Product from "./models/Product.js";
-import ProductStat from "./models/ProductStat.js";
-import Transaction from "./models/Transaction.js";
-import OverallStat from "./models/OverallStat.js";
-import AffiliateStat from "./models/AffiliateStat.js";
 import Company from "./models/Company.js";
+import JobPosting from "./models/JobPosting.js";
 import {
   dataUser,
-  dataProduct,
-  dataProductStat,
-  dataTransaction,
-  dataOverallStat,
-  dataAffiliateStat,
   dataCompanies,
+  dataJobPost,
+
   
 } from "./data/index.js";
 
@@ -46,19 +37,20 @@ app.use(cors());
 app.use("/client", clientRoutes);
 app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
-app.use("/sales", salesRoutes);
 app.use("/bannedcompany", bannedCompanyRoutes); // ĐĂNG KÝ ROUTE MỚI
 
 // app.use("/bannedcompany", bannedCompanyRoutes); // Thêm dòng này
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 9000;
-mongoose.set('strictQuery', false); // hoặc true tùy bạn
+mongoose.set('strictQuery', true); // hoặc true tùy bạn
 mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URL, 
+  // {
+  //   useNewUrlParser: true,
+  //   useUnifiedTopology: true,
+  // }
+)
   .then(async () => {
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 
@@ -70,6 +62,8 @@ mongoose
     // Transaction.insertMany(dataTransaction);
     // User.insertMany(dataUser);
     // Company.insertMany(dataCompanies);
+    // JobPosting.insertMany(dataJobPost);
+
 
 
     })

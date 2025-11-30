@@ -27,7 +27,8 @@ const ReviewCompanyVerification = () => {
   const [currentCompany, setCurrentCompany] = useState({});
 
   // 1. Lọc dữ liệu: Chỉ lấy các công ty đang ở trạng thái Pending (Đang chờ duyệt)
-  const pendingCompanies = data?.filter(company => company.status === 'Pending') || [];
+  // const pendingCompanies = data?.filter(company => company.status === 'Pending') || [];
+  const pendingCompanies = data?.companies || []; // <--- Thêm dòng này
 
   const handleOpenEdit = (company) => {
     setIsEditing(true);
@@ -116,8 +117,8 @@ const ReviewCompanyVerification = () => {
                 startIcon={<CheckCircleIcon />}
                 sx={{
                     ml: 1,
-                    color: theme.palette.primary[600],
-                    backgroundColor: theme.palette.success.light,
+                    color: theme.palette.primary[900],
+                    // backgroundColor: theme.palette.success.light,
                     fontWeight: 'bold',
                     "&:hover": { backgroundColor: theme.palette.success.dark, }
                 }}

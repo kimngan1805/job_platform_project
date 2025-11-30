@@ -72,8 +72,8 @@ const BannedCompanies = () => {
           size="small"
           onClick={() => handleUnban(params.row._id)}
           sx={{
-            color: theme.palette.primary[600],
-            backgroundColor: theme.palette.success.light, // Dùng màu xanh/thành công cho hành động bỏ cấm
+            color: theme.palette.primary[900],
+            // backgroundColor: theme.palette.success.light, // Dùng màu xanh/thành công cho hành động bỏ cấm
             fontWeight: 'bold',
             "&:hover": {
                 backgroundColor: theme.palette.success.dark,
@@ -101,14 +101,7 @@ const BannedCompanies = () => {
             color: theme.palette.secondary[100],
             borderBottom: "none",
           },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: theme.palette.primary.light,
-          },
-          "& .MuiDataGrid-footerContainer": {
-            backgroundColor: theme.palette.background.alt,
-            color: theme.palette.secondary[100],
-            borderTop: "none",
-          },
+        
         }}
       >
         <DataGrid

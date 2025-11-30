@@ -9,7 +9,8 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
-import { setMode } from "state";
+import { setMode, setLogout } from "state";
+import { useNavigate } from "react-router-dom";
 import profileImage from "assets/profile.jpeg";
 import {
   AppBar,
@@ -23,15 +24,21 @@ import {
   MenuItem,
   useTheme,
 } from "@mui/material";
+import { toast } from "react-toastify";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
-  const theme = useTheme();
+  const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
+  
+  const handleClose = () => {
+    dispatch("/login");
+    toast.info("Đăng xuất thành công.")
+  };
 
   return (
     <AppBar
@@ -99,7 +106,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   fontSize="0.85rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  {user.name}
+                  {user.name || "ADMIN"}
                 </Typography>
                 <Typography
                   fontSize="0.75rem"
@@ -118,7 +125,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-              <MenuItem onClick={handleClose}>Log Out</MenuItem>
+              <MenuItem onClick={handleClose}>Đăng xuất</MenuItem>
             </Menu>
           </FlexBetween>
         </FlexBetween>
