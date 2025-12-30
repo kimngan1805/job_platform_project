@@ -1,0 +1,501 @@
+/* apps/src/LandingPage.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Lưu ý: Trong React, body style có thể ảnh hưởng toàn app, 
+       nhưng tạm thời cứ để đây cho đúng thiết kế */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+.hero {
+    background: linear-gradient(135deg, #043c6e 0%, #0a5a9e 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    width: 100%; /* Thêm cái này để full màn hình */
+}
+
+/* Decorative waves */
+.hero::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(255,255,255,0.03) 50px, rgba(255,255,255,0.03) 51px),
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255,255,255,0.03) 50px, rgba(255,255,255,0.03) 51px);
+    animation: wave 20s linear infinite;
+}
+
+@keyframes wave {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 80px;
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: white;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    list-style: none;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: opacity 0.3s;
+}
+
+.nav-links a:hover {
+    opacity: 0.8;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-login {
+    background: #ffd666;
+    color: #043c6e;
+}
+
+.btn-primary {
+    background: #4a9eff;
+    color: white;
+    box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+}
+
+/* Hero Content */
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 80px 0;
+    position: relative;
+    z-index: 5;
+}
+
+.hero-text {
+    flex: 1;
+    max-width: 600px;
+    text-align: left; /* Đảm bảo text căn trái */
+}
+
+.hero-text h1 {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+.hero-text p {
+    font-size: 18px;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+
+/* Hero Illustration */
+.hero-illustration {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative;
+    width: 500px;
+    height: 350px;
+}
+
+.dashboard-header {
+    height: 30px;
+    background: linear-gradient(90deg, #e0e0e0 0%, #e0e0e0 60%, transparent 60%);
+    border-radius: 4px;
+    margin-bottom: 30px;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-line {
+    background: linear-gradient(135deg, #6b9fff 0%, #4a8cff 100%);
+    border-radius: 8px;
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-line::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><path d="M 0,40 Q 25,10 50,25 T 100,20" fill="none" stroke="white" stroke-width="2"/></svg>');
+    background-size: cover;
+}
+
+.chart-pie {
+    background: white;
+    border: 3px solid #f0f0f0;
+    border-radius: 8px;
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-pie::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(#4a8cff 0deg 250deg, #e0e0e0 250deg 360deg);
+}
+
+.chart-small {
+    background: #f5f7fa;
+    border-radius: 8px;
+    height: 80px;
+}
+
+.chart-bar {
+    background: white;
+    border: 3px solid #f0f0f0;
+    border-radius: 8px;
+    height: 80px;
+    position: relative;
+}
+
+.chart-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    right: 20px;
+    height: 50px;
+    background: linear-gradient(to right,
+        transparent 0%, transparent 20%,
+        #4a8cff 20%, #4a8cff 30%,
+        transparent 30%, transparent 45%,
+        #4a8cff 45%, #4a8cff 55%,
+        transparent 55%, transparent 70%,
+        #4a8cff 70%, #4a8cff 80%,
+        transparent 80%);
+}
+
+/* Characters */
+.character {
+    position: absolute;
+    z-index: 10;
+}
+
+.character-left {
+    bottom: -20px;
+    left: -50px;
+    width: 180px;
+}
+
+.character-right {
+    bottom: -20px;
+    right: -50px;
+    width: 180px;
+}
+
+.person {
+    position: relative;
+}
+
+.person-body {
+    width: 70px;
+    height: 120px;
+    background: #ffd666;
+    border-radius: 50% 50% 60% 60%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.person-head {
+    width: 50px;
+    height: 50px;
+    background: #ffdbac;
+    border-radius: 50%;
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.person-arm {
+    width: 40px;
+    height: 80px;
+    background: #ffd666;
+    position: absolute;
+    top: 20px;
+    border-radius: 20px;
+}
+
+.person-arm.left {
+    left: -35px;
+    transform: rotate(-30deg);
+}
+
+.person-arm.right {
+    right: -35px;
+    transform: rotate(30deg);
+}
+
+.person-legs {
+    position: absolute;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.leg {
+    width: 25px;
+    height: 70px;
+    background: #4a8cff;
+    border-radius: 15px 15px 0 0;
+}
+
+.character-right .person-body {
+    background: #4a8cff;
+}
+
+.character-right .person-arm {
+    background: #4a8cff;
+}
+
+.character-right .leg {
+    background: #ffd666;
+}
+
+/* Chat bubbles */
+.chat-bubble {
+    position: absolute;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 20;
+}
+
+.bubble-left {
+    top: 50px;
+    left: -100px;
+    width: 60px;
+    height: 40px;
+}
+
+.bubble-right {
+    top: 50px;
+    right: -100px;
+    width: 80px;
+    height: 50px;
+}
+
+/* Decorative dots */
+.dots {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+}
+
+.dot:nth-child(1) { top: 20%; left: 10%; }
+.dot:nth-child(2) { top: 60%; left: 5%; }
+.dot:nth-child(3) { top: 40%; right: 15%; }
+.dot:nth-child(4) { bottom: 30%; right: 8%; }
+
+@media (max-width: 768px) {
+    nav {
+        padding: 20px 30px;
+    }
+    .nav-links {
+        display: none;
+    }
+    .hero-content {
+        flex-direction: column;
+        padding: 40px 30px;
+    }
+    .hero-text h1 {
+        font-size: 42px;
+    }
+    .dashboard {
+        width: 100%;
+        max-width: 400px;
+    }
+    .character {
+        display: none;
+    }
+}
+/* =========================================
+   PHẦN 2: JOBHUB HERO (MỚI - ĐỔI TÊN CLASS ĐỂ KO TRÙNG)
+   ========================================= */
+
+/* Dots trang trí mới */
+.job-dot { position: absolute; border-radius: 50%; z-index: 1; }
+.job-dot-1 { width: 15px; height: 15px; background: #ffd666; top: 50px; left: 120px; animation: float 3s ease-in-out infinite; }
+.job-dot-2 { width: 10px; height: 10px; background: #ff6b6b; top: 120px; left: 50px; animation: float 4s ease-in-out infinite; }
+.job-dot-3 { width: 12px; height: 12px; background: #4a9eff; bottom: 150px; left: 100px; animation: float 3.5s ease-in-out infinite; }
+
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+
+/* Section JobHub */
+.jobhub-section {
+    min-height: 100vh;
+    padding: 60px 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 80px;
+    position: relative;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    width: 100vw;
+}
+
+.jobhub-content { flex: 1; max-width: 600px; z-index: 5; text-align: left; }
+.jobhub-content h1 { font-size: 72px; font-weight: 700; color: #1a1a1a; line-height: 1.2; margin-bottom: 30px; font-family: 'Georgia', serif; }
+.highlight { background: #ff6b6b; color: white; padding: 5px 20px; display: inline-block; border-radius: 4px; }
+.jobhub-content .tagline { font-size: 20px; color: #5a5a5a; line-height: 1.6; margin-bottom: 40px; }
+.email-form { display: flex; gap: 15px; margin-bottom: 20px; }
+.email-input { flex: 1; padding: 18px 25px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 16px; transition: all 0.3s; background: white; }
+.email-input:focus { outline: none; border-color: #ffd666; box-shadow: 0 0 0 3px rgba(255, 214, 102, 0.2); }
+.btn-jobhub { padding: 18px 45px; background: #ffd666; color: #1a1a1a; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(255, 214, 102, 0.4); }
+.btn-jobhub:hover { background: #ffcd4d; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 214, 102, 0.5); }
+
+.jobhub-illustration { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; z-index: 5; }
+.illustration-container { position: relative; width: 550px; height: 550px; }
+
+/* Person Working (Mới) */
+.person-working { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 10; }
+.chair { width: 140px; height: 160px; background: #ff6b6b; border-radius: 30px 30px 10px 10px; position: relative; box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3); }
+.chair::before { content: ''; position: absolute; width: 20px; height: 80px; background: #333; bottom: -80px; left: 50%; transform: translateX(-50%); border-radius: 5px; }
+.person-head-job { position: absolute; width: 70px; height: 70px; background: #ffdbac; border-radius: 50%; top: -30px; left: 35px; z-index: 2; }
+.person-hair-job { position: absolute; width: 75px; height: 45px; background: #2c3e50; border-radius: 50% 50% 0 0; top: 0; left: -2px; }
+.person-body-job { position: absolute; width: 90px; height: 100px; background: #4a9eff; border-radius: 45px 45px 30px 30px; top: 30px; left: 25px; }
+.person-arm-left { position: absolute; width: 35px; height: 70px; background: #4a9eff; border-radius: 20px; top: 50px; left: -10px; transform: rotate(-30deg); }
+.person-arm-right { position: absolute; width: 35px; height: 70px; background: #4a9eff; border-radius: 20px; top: 50px; right: -10px; transform: rotate(30deg); }
+.person-legs-job { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
+.leg-job { width: 30px; height: 60px; background: #2c5a8e; border-radius: 15px 15px 5px 5px; }
+.shoe { width: 40px; height: 15px; background: #ffd666; border-radius: 0 10px 10px 0; margin-top: -5px; }
+.laptop { position: absolute; width: 120px; height: 80px; background: #2c3e50; border-radius: 5px; top: 85px; left: 50%; transform: translateX(-50%); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+.laptop::before { content: ''; position: absolute; width: 95%; height: 85%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); top: 5%; left: 2.5%; border-radius: 3px; }
+
+/* Dashboard Cards (Mới) */
+.dashboard-card { position: absolute; background: white; border-radius: 16px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); transition: all 0.3s; cursor: pointer; }
+.dashboard-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.15); }
+.card-1 { top: 50px; left: 20px; width: 200px; animation: slideInLeft 1s ease-out; }
+.card-2 { top: 180px; left: -20px; width: 180px; animation: slideInLeft 1.2s ease-out; }
+.card-3 { top: 50px; right: 20px; width: 220px; animation: slideInRight 1s ease-out; }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+.card-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; font-size: 24px; }
+.card-1 .card-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.card-2 .card-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.card-3 .card-icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+.card-date { font-size: 13px; color: #999; display: flex; align-items: center; gap: 8px; }
+.card-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #ffd666, #ffb84d); }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; background: #5cd65c; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
+
+/* Floating Icons (JobHub) */
+.floating-icon-job { position: absolute; animation: floatIcon 4s ease-in-out infinite; }
+@keyframes floatIcon { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(10deg); } }
+.icon-chart-job { top: 280px; right: 40px; width: 100px; height: 100px; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 154, 158, 0.4); animation-delay: 0.5s; position: relative; overflow: hidden; }
+.icon-chart-job::before { content: '📈'; position: absolute; font-size: 50px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.icon-rocket-job { top: 100px; right: 100px; font-size: 60px; animation-delay: 1s; filter: drop-shadow(0 5px 15px rgba(255, 214, 102, 0.5)); }
+.icon-cursor-job { top: 350px; right: 150px; font-size: 40px; animation-delay: 1.5s; filter: drop-shadow(0 5px 15px rgba(74, 158, 255, 0.5)); }
+
+/* Features Section (Mới) */
+.features { padding: 80px 100px; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); }
+.feature-card { background: white; padding: 50px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: all 0.4s; text-align: center; }
+.feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 60px rgba(0,0,0,0.15); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.feature-card:hover h3, .feature-card:hover p { color: white !important; }
+.feature-icon { width: 90px; height: 90px; margin: 0 auto 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+.feature-card:nth-child(2) .feature-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4); }
+.feature-card:nth-child(3) .feature-icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4); }
+.feature-title { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 20px; }
+.feature-description { font-size: 16px; color: #5a5a5a; line-height: 1.7; }
+
+@media (max-width: 1024px) {
+    .jobhub-section { flex-direction: column; padding: 60px 50px; gap: 50px; }
+    .jobhub-content h1 { font-size: 56px; }
+    .illustration-container { width: 450px; height: 450px; }
+    .features { padding: 60px 50px; grid-template-columns: 1fr; }
+}
