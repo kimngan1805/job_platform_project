@@ -43,15 +43,95 @@ const DashboardPage = () => {
 
       {/* HEADER */}
       <header>
-        <div className="logo">Job<span>Hub</span></div>
+        <div className="logo" onClick={() => navigate('/dashboard')} style={{cursor: 'pointer'}}>Job<span>Hub</span></div>
         <nav>
           <a onClick={() => navigate('/dashboard')} style={{cursor: 'pointer'}}>Trang chủ</a>
           
-          {/* 3. SỬA DÒNG NÀY: Thêm sự kiện onClick để chuyển qua trang /find-jobs */}
-          <a onClick={() => navigate('/find-jobs')} style={{cursor: 'pointer'}}>Việc làm</a>
-          
-          <a href="#company">Công ty</a>
-          <a href="#cv">Tạo CV</a>
+          {/* --- MENU VIỆC LÀM (DROPDOWN) --- */}
+          <div className="nav-item-dropdown">
+            <a onClick={() => navigate('/find-jobs')} style={{cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px'}}>
+              Việc làm <i className="fas fa-chevron-down" style={{fontSize: '12px'}}></i>
+            </a>
+            
+            <div className="dropdown-menu">
+                {/* Cột 1 */}
+                <div className="drop-col">
+                    <h4>VIỆC LÀM</h4>
+                    <div className="drop-item" onClick={() => navigate('/find-jobs')}>
+                        <i className="fas fa-search"></i> Tìm việc làm
+                    </div>
+                    <div className="drop-item"><i className="far fa-bookmark"></i> Việc làm đã lưu</div>
+                    <div className="drop-item"><i className="far fa-check-circle"></i> Việc làm đã ứng tuyển</div>
+                    <div className="drop-item"><i className="far fa-thumbs-up"></i> Việc làm phù hợp</div>
+                    <h4 style={{marginTop: '20px'}}>CÔNG TY</h4>
+                    <div className="drop-item"><i className="far fa-building"></i> Danh sách công ty</div>
+                    <div className="drop-item"><i className="fas fa-star"></i> Top công ty</div>
+                </div>
+
+                {/* Cột 2 */}
+                <div className="drop-col">
+                    <h4>VIỆC LÀM THEO VỊ TRÍ</h4>
+                    <div className="drop-item">Việc làm Nhân viên kinh doanh</div>
+                    <div className="drop-item">Việc làm Kế toán</div>
+                    <div className="drop-item">Việc làm Marketing</div>
+                    <div className="drop-item">Việc làm Hành chính nhân sự</div>
+                    <div className="drop-item">Việc làm Chăm sóc khách hàng</div>
+                    <div className="drop-item">Việc làm Ngân hàng</div>
+                    <div className="drop-item">Việc làm IT</div>
+                </div>
+
+                {/* Cột 3 */}
+                <div className="drop-col">
+                    <h4 style={{visibility: 'hidden'}}>...</h4>
+                    <div className="drop-item">Việc làm Lao động phổ thông</div>
+                    <div className="drop-item">Việc làm Senior</div>
+                    <div className="drop-item">Việc làm Kỹ sư xây dựng</div>
+                    <div className="drop-item">Việc làm Thiết kế đồ họa</div>
+                    <div className="drop-item">Việc làm Bất động sản</div>
+                    <div className="drop-item">Việc làm Giáo dục</div>
+                    <div className="drop-item">Việc làm Telesales</div>
+                </div>
+            </div>
+          </div>
+
+          {/* --- MENU TẠO CV (STYLE TOPCV - MỚI) --- */}
+          <div className="nav-item-dropdown">
+            <a style={{cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', color: '#00B14F', fontWeight: '600'}}>
+              Tạo CV <i className="fas fa-chevron-down" style={{fontSize: '12px'}}></i>
+            </a>
+            
+            <div className="dropdown-menu cv-menu">
+                {/* CỘT TRÁI: CÁC MẪU CV */}
+                <div>
+                    <div className="cv-header">
+                        Mẫu CV theo style <i className="fas fa-arrow-right" style={{fontSize: '10px'}}></i>
+                    </div>
+                    <div className="cv-item"><i className="fas fa-cube"></i> Mẫu CV Đơn giản</div>
+                    <div className="cv-item"><i className="fas fa-magic"></i> Mẫu CV Ấn tượng</div>
+                    <div className="cv-item"><i className="fas fa-star"></i> Mẫu CV Chuyên nghiệp</div>
+                    <div className="cv-item"><i className="fas fa-pen-nib"></i> Mẫu CV Hiện đại</div>
+
+                    <div className="cv-header" style={{marginTop: '20px'}}>
+                        Mẫu CV theo vị trí ứng tuyển <i className="fas fa-arrow-right" style={{fontSize: '10px'}}></i>
+                    </div>
+                    <div className="cv-item"><i className="fas fa-briefcase"></i> Nhân viên kinh doanh</div>
+                    <div className="cv-item"><i className="fas fa-laptop-code"></i> Lập trình viên</div>
+                    <div className="cv-item"><i className="fas fa-calculator"></i> Nhân viên kế toán</div>
+                    <div className="cv-item"><i className="fas fa-bullhorn"></i> Chuyên viên marketing</div>
+                </div>
+
+                {/* CỘT PHẢI: QUẢN LÝ CV */}
+                <div className="cv-col-right">
+                    <div className="cv-item"><i className="far fa-file-alt"></i> Quản lý CV</div>
+                    <div className="cv-item"><i className="fas fa-cloud-upload-alt"></i> Tải CV lên</div>
+                    <div className="cv-item"><i className="fas fa-book-open"></i> Hướng dẫn viết CV</div>
+                    <div className="cv-item"><i className="far fa-envelope"></i> Quản lý Cover Letter</div>
+                    <div className="cv-item"><i className="fas fa-feather-alt"></i> Mẫu Cover Letter</div>
+                </div>
+            </div>
+          </div>
+          {/* --- HẾT PHẦN MENU TẠO CV --- */}
+
           <button className="nav-btn" onClick={() => navigate('/login')}>Đăng Xuất</button>
         </nav>
       </header>
@@ -68,7 +148,7 @@ const DashboardPage = () => {
             <option>TP.HCM</option>
             <option>Remote</option>
           </select>
-          <button className="search-btn">Tìm Kiếm</button>
+          <button className="search-btn" onClick={() => navigate('/find-jobs')}>Tìm Kiếm</button>
         </div>
 
         <div className="categories">
