@@ -379,3 +379,76 @@ header {
     .cards-grid { grid-template-columns: 1fr; }
     .nav-links { display: none; }
 }
+/* --- USER DROPDOWN MENU (Thêm vào cuối file) --- */
+.user-area {
+    position: relative; /* Quan trọng để neo cái menu */
+    cursor: pointer;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 60px; /* Cách top header một chút */
+    right: 0;
+    width: 220px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid #EEF2F6;
+    padding: 8px 0;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+    transform-origin: top right;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #2A2E3B;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.dropdown-item:hover {
+    background: #F4F7FD;
+    color: #3B71FE;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: #AAB0C0;
+    font-size: 16px;
+}
+
+.dropdown-item:hover i {
+    color: #3B71FE;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #EEF2F6;
+    margin: 8px 0;
+}
+
+.dropdown-item.logout {
+    color: #FF5252;
+}
+
+.dropdown-item.logout:hover {
+    background: #FFF5F5;
+    color: #FF5252;
+}
+
+.dropdown-item.logout i {
+    color: #FF5252;
+}

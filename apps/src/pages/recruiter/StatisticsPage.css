@@ -1,0 +1,492 @@
+/* src/pages/recruiter/StatisticsPage.css */
+
+.stats-page-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fb;
+    color: #333;
+    min-height: 100vh;
+}
+
+/* Header (Dùng chung style) */
+.stats-header {
+    background: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.stats-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #333;
+}
+
+.stats-nav-menu {
+    display: flex;
+    gap: 35px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.stats-nav-menu li a {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.stats-nav-menu li a:hover,
+.stats-nav-menu li a.active {
+    color: #6366f1;
+}
+
+.stats-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stats-notification-btn {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.stats-notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.6em;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stats-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6366f1;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* Main Container */
+.stats-container {
+    display: flex;
+    min-height: calc(100vh - 70px);
+}
+
+/* Content */
+.stats-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.stats-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.stats-content-title {
+    font-size: 2em;
+    font-weight: 700;
+}
+
+.stats-filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.stats-filter-btn {
+    padding: 10px 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.stats-filter-btn:hover,
+.stats-filter-btn.active {
+    border-color: #6366f1;
+    background: #6366f1;
+    color: white;
+}
+
+/* Company Rank Badge */
+.stats-company-rank-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.stats-rank-info {
+    flex: 1;
+}
+
+.stats-rank-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.stats-rank-title {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.stats-rank-description {
+    font-size: 1.05em;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+.stats-rank-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stats-rank-stat {
+    text-align: center;
+}
+
+.stats-rank-stat-number {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stats-rank-stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stats-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: all 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.stats-icon.blue { background: #dbeafe; }
+.stats-icon.green { background: #d1fae5; }
+.stats-icon.purple { background: #e9d5ff; }
+.stats-icon.orange { background: #fed7aa; }
+
+.stats-label {
+    color: #64748b;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.stats-value {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.stats-change {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.stats-change.up { color: #10b981; }
+.stats-change.down { color: #ef4444; }
+
+/* Charts Section */
+.stats-charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stats-chart-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.stats-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stats-chart-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Funnel Chart */
+.stats-funnel-container {
+    padding: 20px 0;
+}
+
+.stats-funnel-step {
+    margin-bottom: 15px;
+}
+
+.stats-funnel-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stats-funnel-bar {
+    height: 40px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-funnel-bar:hover {
+    transform: scaleX(1.02);
+}
+
+/* Source Analytics */
+.stats-source-list {
+    padding: 10px 0;
+}
+
+.stats-source-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.stats-source-item:hover {
+    background: #f3f4f6;
+}
+
+.stats-source-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stats-source-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: white;
+}
+
+.stats-source-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stats-source-percent {
+    font-size: 0.85em;
+    color: #64748b;
+}
+
+.stats-source-value {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #6366f1;
+}
+
+/* Timeline Styles */
+.stats-timeline-container { padding: 10px 0; }
+.stats-timeline-item { margin-bottom: 20px; }
+.stats-timeline-label { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+.stats-timeline-bar { width: 100%; height: 35px; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+.stats-timeline-progress { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; color: white; font-weight: 600; transition: all 0.5s ease; }
+
+/* Cost Analysis Styles */
+.stats-cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.stats-cost-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 10px; }
+.stats-cost-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+.stats-cost-info { flex: 1; }
+.stats-cost-label { font-size: 0.85em; color: #64748b; margin-bottom: 3px; }
+.stats-cost-value { font-size: 1.2em; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
+.stats-cost-percent { font-size: 0.8em; color: #64748b; }
+
+/* Age Chart Styles */
+.stats-age-chart { padding: 15px 0; }
+.stats-age-bar-item { margin-bottom: 18px; }
+.stats-age-label { font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+.stats-age-bar { width: 100%; height: 30px; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+.stats-age-progress { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+
+/* Experience Chart Styles */
+.stats-exp-chart { display: flex; justify-content: space-around; padding: 20px 0; }
+.stats-exp-item { text-align: center; }
+.stats-exp-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.stats-exp-percent { font-size: 1.6em; font-weight: 700; color: #1e293b; }
+.stats-exp-label { font-weight: 600; color: #1e293b; margin-bottom: 3px; }
+.stats-exp-count { font-size: 0.85em; color: #64748b; }
+
+/* Location Styles */
+.stats-location-list { padding: 10px 0; }
+.stats-location-item { display: grid; grid-template-columns: 100px 1fr 50px; align-items: center; gap: 10px; margin-bottom: 15px; }
+.stats-location-name { font-weight: 600; color: #1e293b; }
+.stats-location-bar { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.stats-location-count { font-weight: 700; color: #6366f1; text-align: right; }
+
+/* Trends Chart Styles */
+.stats-trends-chart { padding: 20px; }
+.stats-trends-legend { display: flex; gap: 30px; margin-bottom: 25px; justify-content: center; }
+.stats-legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; font-weight: 600; }
+.stats-legend-color { width: 20px; height: 8px; border-radius: 4px; }
+.stats-trends-bars { display: flex; justify-content: space-around; align-items: flex-end; height: 200px; gap: 20px; }
+.stats-trend-week { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.stats-trend-bars-group { display: flex; gap: 4px; align-items: flex-end; height: 180px; }
+.stats-trend-bar { width: 15px; border-radius: 4px 4px 0 0; transition: all 0.3s; }
+.stats-trend-bar:hover { transform: scaleY(1.05); }
+.stats-trend-label { font-size: 0.85em; font-weight: 600; color: #64748b; }
+
+/* Top Performers Styles */
+.stats-top-list { padding: 10px 0; }
+.stats-top-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 10px; margin-bottom: 12px; transition: all 0.3s; }
+.stats-top-item:hover { background: #f3f4f6; transform: translateX(5px); }
+.stats-top-rank { width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1em; color: white; }
+.stats-top-info { flex: 1; }
+.stats-top-name { font-weight: 600; color: #1e293b; margin-bottom: 3px; }
+.stats-top-stats { font-size: 0.85em; color: #64748b; }
+.stats-top-badge { padding: 6px 12px; border-radius: 12px; font-size: 0.9em; font-weight: 600; }
+.stats-top-badge.hot { background: #fee2e2; color: #dc2626; }
+.stats-top-badge.good { background: #dcfce7; color: #16a34a; }
+
+/* Skills Styles */
+.stats-skills-list { padding: 10px 0; }
+.stats-skill-item { margin-bottom: 18px; }
+.stats-skill-name { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+.stats-skill-bar { width: 100%; height: 30px; background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+.stats-skill-progress { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; color: white; font-weight: 600; transition: all 0.5s ease; }
+
+/* Job Performance Table */
+.stats-table-section { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 30px; }
+.stats-table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.stats-performance-table { width: 100%; border-collapse: collapse; }
+.stats-performance-table th { background: #f8fafc; padding: 15px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.9em; }
+.stats-performance-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+.stats-performance-table tr:hover { background: #f9fafb; }
+.stats-job-name { font-weight: 600; color: #1e293b; }
+.stats-trend-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
+.stats-trend-badge.hot { background: #fee2e2; color: #dc2626; }
+.stats-trend-badge.good { background: #dcfce7; color: #16a34a; }
+.stats-trend-badge.low { background: #fef3c7; color: #ca8a04; }
+
+/* Export Button */
+.stats-export-section { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); text-align: center; }
+.stats-export-title { font-size: 1.3em; font-weight: 700; margin-bottom: 10px; }
+.stats-export-description { color: #64748b; margin-bottom: 20px; }
+.stats-export-btn { padding: 15px 40px; background: #10b981; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1.05em; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+.stats-export-btn:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3); }
+
+@media (max-width: 1024px) {
+    .stats-charts-section { grid-template-columns: 1fr; }
+    .stats-sidebar { display: none; }
+}
+
+@media (max-width: 768px) {
+    .stats-content { padding: 20px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .stats-rank-stats { flex-direction: column; gap: 15px; }
+    .stats-cost-grid { grid-template-columns: 1fr; }
+    .stats-exp-chart { flex-direction: column; gap: 20px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

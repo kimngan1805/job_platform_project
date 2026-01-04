@@ -1,0 +1,156 @@
+/* src/pages/onboarding/RoleSelectionPage.css */
+
+.role-page-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.role-container {
+    text-align: center;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.role-title {
+    font-size: 2.8em;
+    font-weight: 800;
+    color: #2d3748;
+    margin-bottom: 10px;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.role-subtitle {
+    color: #718096;
+    font-size: 1.2em;
+    margin-bottom: 60px;
+    animation: fadeInDown 0.8s ease-out 0.2s backwards;
+}
+
+.role-cards {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    animation: fadeInUp 1s ease-out 0.4s backwards;
+}
+
+.role-card {
+    background: white;
+    padding: 50px 30px;
+    border-radius: 24px;
+    width: 380px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid transparent;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Hover Effects */
+.role-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+}
+
+.role-card.candidate:hover {
+    border-color: #3B71FE;
+}
+
+.role-card.recruiter:hover {
+    border-color: #00C9A7;
+}
+
+.role-icon-wrapper {
+    width: 100px;
+    height: 100px;
+    background: #f7fafc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    transition: 0.4s;
+}
+
+.role-card:hover .role-icon-wrapper {
+    transform: scale(1.1);
+}
+
+.role-card.candidate:hover .role-icon-wrapper {
+    background: #ebf2ff;
+}
+
+.role-card.recruiter:hover .role-icon-wrapper {
+    background: #e6fffa;
+}
+
+.role-icon {
+    font-size: 3.5em;
+}
+
+.role-name {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+.role-desc {
+    color: #718096;
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    flex: 1; /* Để nút luôn nằm dưới cùng */
+}
+
+.role-btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    background: transparent;
+    border: 2px solid #e2e8f0;
+    color: #718096;
+}
+
+.role-card:hover .role-btn {
+    color: white;
+    border-color: transparent;
+}
+
+.role-card.candidate:hover .role-btn {
+    background: #3B71FE;
+    box-shadow: 0 5px 15px rgba(59, 113, 254, 0.3);
+}
+
+.role-card.recruiter:hover .role-btn {
+    background: #00C9A7;
+    box-shadow: 0 5px 15px rgba(0, 201, 167, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+    .role-cards { flex-direction: column; align-items: center; }
+    .role-card { width: 100%; max-width: 400px; }
+}

@@ -1,3 +1,4 @@
+// src/pages/LoginPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/LoginPage.css';
@@ -48,6 +49,7 @@ const LoginPage = () => {
   }, []);
 
   // 3. Xử lý Submit Form
+  // 3. Xử lý Submit Form
   const handleSubmit = (event) => {
     event.preventDefault();
     const username = event.target.username?.value;
@@ -55,22 +57,57 @@ const LoginPage = () => {
     const email = event.target.email?.value;
     const confirmPass = event.target.confirmPassword?.value;
 
+    // --- A. LOGIC ĐĂNG NHẬP VỚI TÀI KHOẢN TEST (HARDCODE) ---
+    if (isLogin) {
+        // 1. Nếu là NHÀ TUYỂN DỤNG (HR)
+        if (username === 'hr' && password === '123') {
+            const userData = { name: 'HR Manager', role: 'recruiter' };
+            localStorage.setItem('user_data', JSON.stringify(userData));
+            
+            setBtnText('Logging in as HR...');
+            setBtnClass('login-btn loading');
+            
+            setTimeout(() => { navigate('/recruiter'); }, 1000);
+            return;
+        }
+
+        // 2. Nếu là ỨNG VIÊN (Candidate)
+        if (username === 'ngan' && password === '123') {
+            const userData = { name: 'Ngân Kim', role: 'candidate' };
+            localStorage.setItem('user_data', JSON.stringify(userData));
+            
+            setBtnText('Logging in as Candidate...');
+            setBtnClass('login-btn loading');
+            
+            setTimeout(() => { navigate('/find-jobs'); }, 1000);
+            return;
+        }
+    }
+
+    // --- B. LOGIC ĐĂNG KÝ / ĐĂNG NHẬP THƯỜNG ---
     let isValid = true;
     
-    // Validate
+    // Validate cơ bản
     if (!username || !password) isValid = false;
-    if (!isLogin) { // Nếu đang đăng ký
+    if (!isLogin) { // Nếu đang đăng ký thì check thêm email và confirm pass
         if (!email || password !== confirmPass) isValid = false;
     }
 
+    // Nếu dữ liệu không hợp lệ
     if (!isValid) {
         setShakeField(true);
         setTimeout(() => setShakeField(false), 500);
-        if (!isLogin && password !== confirmPass) alert("Mật khẩu không khớp!");
+        if (!isLogin && password !== confirmPass) {
+            alert("Mật khẩu xác nhận không khớp!");
+        } else if (isLogin) {
+            alert("Sai tài khoản hoặc mật khẩu! (Gợi ý: hr/123 hoặc ngan/123)");
+        } else {
+            alert("Vui lòng điền đầy đủ thông tin!");
+        }
         return;
     }
 
-    // Animation Loading
+    // --- C. XỬ LÝ THÀNH CÔNG (MÔ PHỎNG) ---
     setBtnText(isLogin ? 'Logging in...' : 'Registering...');
     setBtnClass('login-btn loading');
 
@@ -78,13 +115,11 @@ const LoginPage = () => {
       setBtnText('✓ Success!');
       setTimeout(() => {
         if (isLogin) {
-            // --- THAY ĐỔI Ở ĐÂY: Chuyển hướng sang trang Dashboard ---
+            // Trường hợp đăng nhập user thường (không phải hr/ngan) -> Vào dashboard chung
             navigate('/dashboard'); 
         } else {
-            alert("Đăng ký thành công! Hãy đăng nhập.");
-            setIsLogin(true); // Về trang Login
-            setBtnText('LOGIN');
-            setBtnClass('login-btn');
+            // --- ĐĂNG KÝ THÀNH CÔNG -> CHUYỂN QUA CHỌN ROLE ---
+            navigate('/role-selection');
         }
       }, 1000);
     }, 1500);
@@ -101,7 +136,7 @@ const LoginPage = () => {
         <div className="left-side">
             <div className="logo">
                 <div className="logo-icon"><div className="logo-shape"></div></div>
-                <div className="logo-text"><h2>AddWebSolution</h2><p>"lets tech solution"</p></div>
+                <div className="logo-text"><h2>Finder.</h2><p>"Kết nối cơ hội"</p></div>
             </div>
             <div className="illustration">
                 <div className="cloud cloud-1"></div>
@@ -162,7 +197,7 @@ const LoginPage = () => {
 
                 <button type="submit" className={btnClass}>{isLogin ? 'LOGIN' : 'REGISTER'}</button>
 
-                {/* Phần Social Login thêm vào */}
+                {/* Phần Social Login */}
                 <div className="social-login">
                     <div className="divider"><span>Or {isLogin ? 'login' : 'register'} with</span></div>
                     <div className="social-buttons">
@@ -176,7 +211,7 @@ const LoginPage = () => {
                 </div>
 
                 <p className="register-text">
-                    {isLogin ? "New to Logo? " : "Already have an account? "}
+                    {isLogin ? "New to Finder? " : "Already have an account? "}
                     <a href="#" onClick={(e) => {
                         e.preventDefault();
                         setIsLogin(!isLogin);
