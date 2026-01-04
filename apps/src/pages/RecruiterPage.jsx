@@ -20,89 +20,79 @@ const RecruiterPage = () => {
     }, []);
 
     // ==================================================================
+    // 2. LOGIC MỚI: FEED CỘNG ĐỒNG (INSTAGRAM STYLE) - CHO ỨNG VIÊN
+    // ==================================================================
+    const [posts, setPosts] = useState([
+        {
+            id: 1,
+            company: 'FPT Software',
+            avatar: '💻',
+            time: '2 giờ trước',
+            content: 'Chào mừng 500 anh em Fresher Java đã gia nhập đại gia đình F-Complex Đà Nẵng! 🚀 Cùng nhau chinh phục những dự án triệu đô nhé. #FPT #Fresher #Java',
+            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
+            likes: 124,
+            comments: 15,
+            isLiked: false
+        },
+        {
+            id: 2,
+            company: 'Shopee Vietnam',
+            avatar: '🛒',
+            time: '5 giờ trước',
+            content: '🔥 12.12 Sale tưng bừng - Team Tech của Shopee vẫn đang "trực chiến" xuyên đêm để đảm bảo hệ thống mượt mà nhất. Pizza đã về tới văn phòng! 🍕 #ShopeeTech #LifeAtShopee',
+            image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
+            likes: 856,
+            comments: 42,
+            isLiked: true
+        },
+        {
+            id: 3,
+            company: 'VNG Corp',
+            avatar: '🦄',
+            time: '1 ngày trước',
+            content: 'Văn phòng VNG Campus hôm nay thật chill. Góc làm việc view hồ bơi thế này thì code "bao mượt" nha anh em! 😎 #LifeAtVNG #VNGCampus',
+            image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+            likes: 430,
+            comments: 28,
+            isLiked: false
+        }
+    ]);
+
+    const handleLike = (id) => {
+        setPosts(posts.map(post => 
+            post.id === id 
+            ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 } 
+            : post
+        ));
+    };
+    // ==================================================================
     // 2. STATES CŨ (Giữ nguyên của vợ)
     // ==================================================================
     // --- States for View Management ---
-    const [activeView, setActiveView] = useState('folders'); // 'folders' or 'applications'
+    const [activeView, setActiveView] = useState('folders');
     const [activeSidebarItem, setActiveSidebarItem] = useState('Hồ sơ ứng viên');
     const [selectedFolder, setSelectedFolder] = useState({ name: '', count: 0 });
-
-    // --- States for AI Analysis ---
     const [analyzing, setAnalyzing] = useState(false);
     const [showAiResults, setShowAiResults] = useState(false);
-
-    // --- States for Chat Modal ---
     const [showChatModal, setShowChatModal] = useState(false);
     const [chatCandidateName, setChatCandidateName] = useState('');
     const [chatInput, setChatInput] = useState('');
     const [chatMessages, setChatMessages] = useState([
-        {
-            sender: 'candidate',
-            text: 'Xin chào, cảm ơn quý công ty đã xem xét hồ sơ của em!',
-        },
-        {
-            sender: 'recruiter',
-            text: 'Chào bạn! Chúng tôi đã xem qua CV của bạn và rất ấn tượng. Bạn có thể tham gia phỏng vấn vào thứ 5 tuần sau được không?',
-        },
+        { sender: 'candidate', text: 'Xin chào, cảm ơn quý công ty đã xem xét hồ sơ của em!', },
+        { sender: 'recruiter', text: 'Chào bạn! Chúng tôi đã xem qua CV của bạn và rất ấn tượng. Bạn có thể tham gia phỏng vấn vào thứ 5 tuần sau được không?', },
     ]);
     const chatMessagesEndRef = useRef(null);
 
-    // --- View Handlers ---
-    const openFolder = (folderName, count) => {
-        setSelectedFolder({ name: folderName, count });
-        setActiveView('applications');
-        setShowAiResults(false); // Reset AI results when switching folder
-    };
-
-    const closeFolder = () => {
-        setActiveView('folders');
-    };
-
-    // --- AI Analysis Handler ---
-    const handleAnalyzeApplications = () => {
-        setAnalyzing(true);
-        // Simulate AI analysis delay
-        setTimeout(() => {
-            setAnalyzing(false);
-            setShowAiResults(true);
-        }, 2000);
-    };
-
-    // --- Candidate Actions ---
-    const handleAcceptCandidate = (name) => {
-        if (window.confirm(`Bạn có chắc chắn muốn chấp nhận ứng viên ${name}?`)) {
-            setChatCandidateName(name);
-            setShowChatModal(true);
-        }
-    };
-
-    const handleRejectCandidate = () => {
-        alert('Đã từ chối ứng viên');
-    };
-
-    const handleViewCV = (name) => {
-        alert(`Xem CV của ${name}`);
-    };
-
-    // --- Chat Handlers ---
-    const closeChat = () => {
-        setShowChatModal(false);
-    };
-
-    const handleSendMessage = () => {
-        const message = chatInput.trim();
-        if (message) {
-            setChatMessages([...chatMessages, { sender: 'recruiter', text: message }]);
-            setChatInput('');
-        }
-    };
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleSendMessage();
-        }
-    };
-
+    const openFolder = (folderName, count) => { setSelectedFolder({ name: folderName, count }); setActiveView('applications'); setShowAiResults(false); };
+    const closeFolder = () => { setActiveView('folders'); };
+    const handleAnalyzeApplications = () => { setAnalyzing(true); setTimeout(() => { setAnalyzing(false); setShowAiResults(true); }, 2000); };
+    const handleAcceptCandidate = (name) => { if (window.confirm(`Bạn có chắc chắn muốn chấp nhận ứng viên ${name}?`)) { setChatCandidateName(name); setShowChatModal(true); } };
+    const handleRejectCandidate = () => { alert('Đã từ chối ứng viên'); };
+    const handleViewCV = (name) => { alert(`Xem CV của ${name}`); };
+    const closeChat = () => { setShowChatModal(false); };
+    const handleSendMessage = () => { const message = chatInput.trim(); if (message) { setChatMessages([...chatMessages, { sender: 'recruiter', text: message }]); setChatInput(''); } };
+    const handleKeyPress = (e) => { if (e.key === 'Enter') { handleSendMessage(); } };
+    useEffect(() => { if (chatMessagesEndRef.current) { chatMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' }); } }, [chatMessages, showChatModal]);
     // Auto-scroll chat to bottom
     useEffect(() => {
         if (chatMessagesEndRef.current) {
@@ -116,45 +106,111 @@ const RecruiterPage = () => {
     // ==================================================================
     if (userRole === 'candidate') {
         return (
-            <div style={{ padding: '40px', background: '#F4F7FD', minHeight: '100vh', fontFamily: 'Segoe UI' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+            <div style={{ background: '#F4F7FD', minHeight: '100vh', fontFamily: 'Segoe UI' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3B71FE', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }} onClick={() => navigate('/find-jobs')}>
                         <span>⚡</span> Finder.
                     </div>
-                    <button onClick={() => navigate('/find-jobs')} style={{ padding: '10px 20px', border: 'none', background: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-                        <i className="fas fa-arrow-left"></i> Quay lại tìm việc
+                    <button onClick={() => navigate('/find-jobs')} style={{ padding: '10px 20px', border: 'none', background: '#F4F7FD', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', color: '#555' }}>
+                        ← Quay lại tìm việc
                     </button>
                 </header>
 
-                <div style={{ textAlign: 'center', maxWidth: '1000px', margin: '0 auto' }}>
-                    <h1 style={{ color: '#2A2E3B', fontSize: '32px', marginBottom: '10px' }}>Top Nhà Tuyển Dụng Hàng Đầu 🏆</h1>
-                    <p style={{ color: '#7D8597', marginBottom: '50px' }}>Khám phá văn hóa và cơ hội nghề nghiệp tại các công ty công nghệ lớn nhất.</p>
+                <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px' }}>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px' }}>
-                        {[
-                            { name: 'FPT Software', jobs: 12, icon: '💻' },
-                            { name: 'VNG Corp', jobs: 8, icon: '🦄' },
-                            { name: 'Momo', jobs: 5, icon: '💸' },
-                            { name: 'Viettel', jobs: 20, icon: '📡' },
-                            { name: 'Shopee', jobs: 15, icon: '🛒' },
-                            { name: 'ZaloPay', jobs: 6, icon: '📱' }
-                        ].map((company, index) => (
-                            <div key={index} style={{ background: 'white', padding: '30px', borderRadius: '16px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)', cursor: 'pointer', transition: '0.3s', border: '1px solid #EEF2F6' }}
-                                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                            >
-                                <div style={{ width: '60px', height: '60px', background: '#F4F7FD', borderRadius: '12px', margin: '0 auto 15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>
-                                    {company.icon}
+                    {/* SECTION 1: TOP COMPANIES GRID (GIỮ NGUYÊN CỦA VỢ) */}
+                    <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+                        <h1 style={{ color: '#2A2E3B', fontSize: '32px', marginBottom: '10px' }}>Top Nhà Tuyển Dụng Hàng Đầu 🏆</h1>
+                        <p style={{ color: '#7D8597', marginBottom: '40px' }}>Khám phá văn hóa và cơ hội nghề nghiệp tại các công ty công nghệ lớn nhất.</p>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+                            {[
+                                { name: 'FPT Software', jobs: 12, icon: '💻' },
+                                { name: 'VNG Corp', jobs: 8, icon: '🦄' },
+                                { name: 'Momo', jobs: 5, icon: '💸' },
+                                { name: 'Viettel', jobs: 20, icon: '📡' },
+                                { name: 'Shopee', jobs: 15, icon: '🛒' },
+                                { name: 'ZaloPay', jobs: 6, icon: '📱' }
+                            ].map((company, index) => (
+                                <div key={index} style={{ background: 'white', padding: '20px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', cursor: 'pointer', transition: '0.3s', display: 'flex', alignItems: 'center', gap: '15px' }}
+                                    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+                                    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
+                                    <div style={{ width: '50px', height: '50px', background: '#F4F7FD', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
+                                        {company.icon}
+                                    </div>
+                                    <div style={{ textAlign: 'left' }}>
+                                        <h3 style={{ margin: '0 0 5px', color: '#2A2E3B', fontSize: '16px' }}>{company.name}</h3>
+                                        <p style={{ margin: '0', fontSize: '13px', color: '#3B71FE', fontWeight: '600' }}>{company.jobs} vị trí đang tuyển</p>
+                                    </div>
                                 </div>
-                                <h3 style={{ margin: '0 0 8px', color: '#2A2E3B' }}>{company.name}</h3>
-                                <p style={{ margin: '0', fontSize: '14px', color: '#3B71FE', fontWeight: '600' }}>{company.jobs} vị trí đang tuyển</p>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
 
-                    <div style={{ marginTop: '50px', padding: '40px', background: '#E3F2FD', borderRadius: '20px', color: '#1565C0', border: '1px dashed #90CAF9' }}>
-                        <h3 style={{ margin: '0 0 10px' }}>🎨 Giao diện chi tiết đang được thiết kế...</h3>
-                        <p style={{ margin: '0' }}>Tính năng xem văn phòng 360 độ và review công ty sẽ sớm ra mắt!</p>
+                    {/* SECTION 2: COMPANY FEED (MỚI THÊM VÀO ĐÂY NÈ) */}
+                    <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '30px', gap: '10px' }}>
+                            <div style={{ height: '2px', width: '50px', background: '#E0E0E0' }}></div>
+                            <h2 style={{ color: '#2A2E3B', fontSize: '24px', margin: 0 }}>Khoảnh khắc Doanh nghiệp 📸</h2>
+                            <div style={{ height: '2px', width: '50px', background: '#E0E0E0' }}></div>
+                        </div>
+
+                        {/* LIST POSTS */}
+                        {posts.map(post => (
+                            <div key={post.id} style={{ background: 'white', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '30px', overflow: 'hidden', animation: 'fadeIn 0.5s ease' }}>
+                                {/* Post Header */}
+                                <div style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '40px', height: '40px', background: '#F0F2F5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', border: '2px solid #3B71FE' }}>
+                                            {post.avatar}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ margin: 0, color: '#1f2937', fontSize: '15px' }}>{post.company}</h4>
+                                            <span style={{ fontSize: '12px', color: '#6b7280' }}>{post.time} • 🌏 Công khai</span>
+                                        </div>
+                                    </div>
+                                    <button style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>•••</button>
+                                </div>
+
+                                {/* Post Content */}
+                                <div style={{ padding: '0 20px 15px', fontSize: '15px', color: '#374151', lineHeight: '1.5' }}>
+                                    {post.content}
+                                </div>
+
+                                {/* Post Image */}
+                                <div style={{ width: '100%', height: '400px', overflow: 'hidden' }}>
+                                    <img src={post.image} alt="Post" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+                                         onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+                                         onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                                    />
+                                </div>
+
+                                {/* Post Actions */}
+                                <div style={{ padding: '15px 20px' }}>
+                                    <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+                                        <button onClick={() => handleLike(post.id)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: post.isLiked ? '#ef4444' : '#374151', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            {post.isLiked ? '❤️' : '🤍'} 
+                                        </button>
+                                        <button style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer' }}>💬</button>
+                                        <button style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer' }}>🚀</button>
+                                        <button style={{ marginLeft: 'auto', border: 'none', background: '#F0F9FF', color: '#0284c7', padding: '5px 15px', borderRadius: '20px', fontWeight: '600', cursor: 'pointer' }}>
+                                            Xem Job
+                                        </button>
+                                    </div>
+                                    <div style={{ fontWeight: '600', fontSize: '14px', color: '#1f2937' }}>
+                                        {post.likes} lượt thích
+                                    </div>
+                                    <div style={{ color: '#6b7280', fontSize: '14px', marginTop: '5px', cursor: 'pointer' }}>
+                                        Xem tất cả {post.comments} bình luận
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        <div style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280' }}>
+                            <p>Đã hết tin mới hôm nay 🎉</p>
+                        </div>
                     </div>
                 </div>
             </div>
