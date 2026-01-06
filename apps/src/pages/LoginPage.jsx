@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/LoginPage.css';
@@ -48,81 +47,97 @@ const LoginPage = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // 3. Xử lý Submit Form
-  // 3. Xử lý Submit Form
-  const handleSubmit = (event) => {
+  // 3. Xử lý Submit Form (ĐÃ TÍCH HỢP API)
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const username = event.target.username?.value;
-    const password = event.target.password?.value;
+    const username = event.target.username?.value; // Khi register dùng làm Full Name
     const email = event.target.email?.value;
+    const password = event.target.password?.value;
     const confirmPass = event.target.confirmPassword?.value;
 
-    // --- A. LOGIC ĐĂNG NHẬP VỚI TÀI KHOẢN TEST (HARDCODE) ---
-    if (isLogin) {
-        // 1. Nếu là NHÀ TUYỂN DỤNG (HR)
-        if (username === 'hr' && password === '123') {
-            const userData = { name: 'HR Manager', role: 'recruiter' };
-            localStorage.setItem('user_data', JSON.stringify(userData));
-            
-            setBtnText('Logging in as HR...');
-            setBtnClass('login-btn loading');
-            
-            setTimeout(() => { navigate('/recruiter'); }, 1000);
-            return;
-        }
-
-        // 2. Nếu là ỨNG VIÊN (Candidate)
-        if (username === 'ngan' && password === '123') {
-            const userData = { name: 'Ngân Kim', role: 'candidate' };
-            localStorage.setItem('user_data', JSON.stringify(userData));
-            
-            setBtnText('Logging in as Candidate...');
-            setBtnClass('login-btn loading');
-            
-            setTimeout(() => { navigate('/find-jobs'); }, 1000);
-            return;
-        }
-    }
-
-    // --- B. LOGIC ĐĂNG KÝ / ĐĂNG NHẬP THƯỜNG ---
+    // --- VALIDATE ---
     let isValid = true;
     
-    // Validate cơ bản
-    if (!username || !password) isValid = false;
-    if (!isLogin) { // Nếu đang đăng ký thì check thêm email và confirm pass
-        if (!email || password !== confirmPass) isValid = false;
+    // Login cần Email + Pass, Register cần thêm Username + Confirm Pass
+    if (isLogin) {
+        if (!email || !password) isValid = false;
+    } else {
+        if (!username || !email || !password || password !== confirmPass) isValid = false;
     }
 
-    // Nếu dữ liệu không hợp lệ
     if (!isValid) {
         setShakeField(true);
         setTimeout(() => setShakeField(false), 500);
         if (!isLogin && password !== confirmPass) {
             alert("Mật khẩu xác nhận không khớp!");
-        } else if (isLogin) {
-            alert("Sai tài khoản hoặc mật khẩu! (Gợi ý: hr/123 hoặc ngan/123)");
         } else {
             alert("Vui lòng điền đầy đủ thông tin!");
         }
         return;
     }
 
-    // --- C. XỬ LÝ THÀNH CÔNG (MÔ PHỎNG) ---
-    setBtnText(isLogin ? 'Logging in...' : 'Registering...');
+    // --- GỌI API BACKEND ---
     setBtnClass('login-btn loading');
+    setBtnText(isLogin ? 'Logging in...' : 'Registering...');
 
-    setTimeout(() => {
-      setBtnText('✓ Success!');
-      setTimeout(() => {
-        if (isLogin) {
-            // Trường hợp đăng nhập user thường (không phải hr/ngan) -> Vào dashboard chung
-            navigate('/dashboard'); 
-        } else {
-            // --- ĐĂNG KÝ THÀNH CÔNG -> CHUYỂN QUA CHỌN ROLE ---
-            navigate('/role-selection');
+    try {
+        // Xác định endpoint
+        const endpoint = isLogin ? 'http://localhost:5000/api/login' : 'http://localhost:5000/api/register';
+        
+        // Chuẩn bị dữ liệu gửi đi
+        const payload = isLogin 
+            ? { email, password } 
+            : { email, password, full_name: username, role: 'candidate' }; // Mặc định role candidate khi đăng ký
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Something went wrong');
         }
-      }, 1000);
-    }, 1500);
+
+        // --- XỬ LÝ THÀNH CÔNG ---
+        setBtnText('✓ Success!');
+        
+        setTimeout(() => {
+            if (isLogin) {
+                // Đăng nhập thành công -> Lưu user info
+                localStorage.setItem('user_data', JSON.stringify(data.user));
+                
+                // Chuyển hướng dựa vào role (để vào đúng trang Dashboard)
+                if (data.user.role === 'recruiter') {
+                    navigate('/recruiter');
+                } else if (data.user.role === 'admin') {
+                    navigate('/admin'); // Nếu có trang admin
+                } else {
+                    // Mặc định candidate vào trang tìm việc hoặc profile
+                    navigate('/find-jobs'); 
+                }
+            } else {
+                // Đăng ký thành công -> Chuyển sang màn hình chọn Role (như thiết kế cũ)
+                // Lưu tạm thông tin user vừa tạo để trang RoleSelection dùng
+                localStorage.setItem('user_data', JSON.stringify(data.user));
+                navigate('/role-selection');
+            }
+        }, 1000);
+
+    } catch (err) {
+        // Xử lý lỗi
+        setBtnClass('login-btn error'); 
+        setBtnText('Failed');
+        alert(err.message);
+        
+        // Reset nút về trạng thái ban đầu
+        setTimeout(() => {
+            setBtnClass('login-btn');
+            setBtnText(isLogin ? 'LOGIN' : 'REGISTER');
+        }, 2000);
+    }
   };
 
   return (
@@ -166,17 +181,19 @@ const LoginPage = () => {
                 <h1>{isLogin ? 'Login' : 'Register'}</h1>
                 <p className="welcome-text">{welcomeText}</p>
 
-                <div className="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" placeholder="Enter your username" className={shakeField ? 'shake' : ''} />
-                </div>
-
+                {/* Khi đăng ký thì hiện Username (Full Name) */}
                 {!isLogin && (
                     <div className="form-group">
-                        <label>Email Address</label>
-                        <input type="email" name="email" placeholder="example@gmail.com" className={shakeField ? 'shake' : ''} />
+                        <label>Full Name</label>
+                        <input type="text" name="username" placeholder="Enter your name" className={shakeField ? 'shake' : ''} />
                     </div>
                 )}
+
+                {/* Email luôn hiện */}
+                <div className="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="example@gmail.com" className={shakeField ? 'shake' : ''} />
+                </div>
 
                 <div className="form-group">
                     <label>Password</label>
@@ -195,7 +212,7 @@ const LoginPage = () => {
                     </div>
                 )}
 
-                <button type="submit" className={btnClass}>{isLogin ? 'LOGIN' : 'REGISTER'}</button>
+                <button type="submit" className={btnClass}>{btnText}</button>
 
                 {/* Phần Social Login */}
                 <div className="social-login">

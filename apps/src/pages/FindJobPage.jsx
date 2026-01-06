@@ -5,26 +5,83 @@ import '../css/FindJobPage.css';
 
 const FindJobPage = () => {
     const navigate = useNavigate();
+    const [dbJobs, setDbJobs] = useState([]);
 
-    // State quản lý hiển thị bảng gợi ý search
+    const fetchAllJobs = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/all-job-posts');
+            const result = await res.json();
+            console.log("Kết quả từ Database Neon:", result); // SOI Ở ĐÂY: Nhấn F12 trên web để xem
+            if (result.success) {
+                setDbJobs(result.data);
+            }
+        } catch (err) {
+            console.log("Lỗi kết nối API:", err);
+        }
+    };
+    // ==================================================================
+    // 1. LOGIC SEARCH & DROPDOWN (CŨ)
+    // ==================================================================
     const [showSuggestions, setShowSuggestions] = useState(false);
     const searchRef = useRef(null);
 
-    // --- STATE MỚI: QUẢN LÝ DROPDOWN USER & ROLE ---
+    // ==================================================================
+    // 2. LOGIC USER ROLE (CŨ)
+    // ==================================================================
     const [showUserDropdown, setShowUserDropdown] = useState(false);
-    const [userRole, setUserRole] = useState(''); // Lưu role người dùng
+    const [userRole, setUserRole] = useState('');
     const userRef = useRef(null);
 
-    // Xử lý click ra ngoài để tắt các popup & Lấy ROLE
+    // ==================================================================
+    // 3. LOGIC MỚI: EXPAND NHÓM NGHỀ (ACCORDION)
+    // ==================================================================
+    // State lưu tên category đang được mở
+    const [expandedCategory, setExpandedCategory] = useState(null);
+
+    // Dữ liệu giả định cho các nhóm nghề và nghề con
+    const careerCategories = [
+        {
+            id: 'sales',
+            name: 'Kinh doanh / Bán hàng',
+            subItems: ['Sales Admin', 'Telesales', 'Account Manager', 'Trưởng phòng kinh doanh']
+        },
+        {
+            id: 'marketing',
+            name: 'Marketing / PR',
+            subItems: ['Content Writer', 'Digital Marketing', 'SEO Specialist', 'Brand Manager']
+        },
+        {
+            id: 'it',
+            name: 'IT - Phần mềm',
+            subItems: ['Frontend Developer', 'Backend Developer', 'Tester / QA', 'Mobile Developer', 'DevOps']
+        },
+        {
+            id: 'hr',
+            name: 'Hành chính / Nhân sự',
+            subItems: ['Recruiter', 'C&B', 'Lễ tân', 'Thư ký']
+        }
+    ];
+
+    // Hàm xử lý khi bấm vào nhóm nghề
+    const toggleCategory = (id) => {
+        if (expandedCategory === id) {
+            setExpandedCategory(null); // Nếu đang mở thì đóng lại
+        } else {
+            setExpandedCategory(id); // Nếu chưa mở thì mở ra
+        }
+    };
+
+    // ==================================================================
+    // 4. USE EFFECT CHUNG
+    // ==================================================================
     useEffect(() => {
-        // 1. Lấy thông tin Role từ LocalStorage
+        fetchAllJobs();
         const savedData = localStorage.getItem('user_data');
         if (savedData) {
             const user = JSON.parse(savedData);
-            setUserRole(user.role); // 'recruiter' hoặc 'candidate'
+            setUserRole(user.role);
         }
 
-        // 2. Xử lý click outside
         function handleClickOutside(event) {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowSuggestions(false);
@@ -39,15 +96,18 @@ const FindJobPage = () => {
         };
     }, []);
 
-    const handleJobClick = () => {
-        navigate('/job-detail');
+    const handleJobClick = (jobId) => {
+        if (jobId) {
+            navigate(`/job-detail/${jobId}`); // Chuyển sang job thật
+        } else {
+            navigate('/job-detail'); // Chuyển sang bản mẫu Google
+        }
     };
 
-    // Hàm xử lý đăng xuất
     const handleLogout = () => {
         const confirm = window.confirm("Bạn có chắc muốn đăng xuất?");
         if (confirm) {
-            localStorage.removeItem('user_data'); // Xóa data khi đăng xuất
+            localStorage.removeItem('user_data');
             navigate('/login');
         }
     };
@@ -68,10 +128,9 @@ const FindJobPage = () => {
                     <a onClick={() => navigate('/tools')}>Công Cụ</a>
                 </div>
 
-                {/* --- KHU VỰC USER VỚI DROPDOWN --- */}
-                <div 
-                    className="user-area" 
-                    ref={userRef} 
+                <div
+                    className="user-area"
+                    ref={userRef}
                     onClick={() => setShowUserDropdown(!showUserDropdown)}
                 >
                     <span style={{ fontSize: '14px', fontWeight: '700' }}>
@@ -127,26 +186,45 @@ const FindJobPage = () => {
                         <label className="checkbox-item"><input type="checkbox" /> Remote</label>
                     </div>
 
+                    {/* --- PHẦN NHÓM NGHỀ ĐÃ SỬA LOGIC ACCORDION --- */}
                     <div className="filter-group">
                         <span className="filter-title">Nhóm nghề</span>
-                        <div className="checkbox-item group-header">
-                            <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                                <input type="checkbox" /> Kinh doanh / Bán hàng
-                            </label>
-                            <i className="fas fa-chevron-right"></i>
-                        </div>
-                        <div className="checkbox-item group-header">
-                            <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                                <input type="checkbox" /> Marketing / PR
-                            </label>
-                            <i className="fas fa-chevron-right"></i>
-                        </div>
-                        <div className="checkbox-item group-header">
-                            <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                                <input type="checkbox" /> IT - Phần mềm
-                            </label>
-                            <i className="fas fa-chevron-right"></i>
-                        </div>
+
+                        {careerCategories.map((category) => (
+                            <div key={category.id} style={{ marginBottom: '8px' }}>
+                                {/* Header của nhóm nghề: Click vào để xổ ra */}
+                                <div
+                                    className="checkbox-item group-header"
+                                    onClick={() => toggleCategory(category.id)}
+                                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer', pointerEvents: 'none' }}>
+                                        {/* Input cha: Có thể bỏ pointerEvents: none nếu muốn check cả cha */}
+                                        <input type="checkbox" onChange={() => { }} />
+                                        {category.name}
+                                    </label>
+                                    <i
+                                        className={`fas fa-chevron-${expandedCategory === category.id ? 'down' : 'right'}`}
+                                        style={{ fontSize: '12px', color: '#888', transition: '0.3s' }}
+                                    ></i>
+                                </div>
+
+                                {/* Danh sách con: Chỉ hiện khi expandedCategory khớp id */}
+                                {expandedCategory === category.id && (
+                                    <div style={{ paddingLeft: '25px', marginTop: '5px', animation: 'fadeIn 0.3s ease' }}>
+                                        {category.subItems.map((sub, index) => (
+                                            <label
+                                                key={index}
+                                                className="checkbox-item"
+                                                style={{ fontSize: '13px', color: '#555', marginBottom: '8px' }}
+                                            >
+                                                <input type="checkbox" /> {sub}
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
 
                     <div className="filter-group">
@@ -225,8 +303,30 @@ const FindJobPage = () => {
                         </select>
                     </div>
 
-                    {/* LOGIC HIỂN THỊ NÚT ỨNG TUYỂN DỰA TRÊN ROLE */}
                     <div className="cards-grid">
+                        {/* --- HIỂN THỊ JOB THẬT TỪ DATABASE --- */}
+                        {dbJobs.map((job) => (
+                            <div className="job-card bg-1" key={job.id} onClick={() => handleJobClick(job.id)}>
+                                <div className="card-top">
+                                    <div className="card-icon-box" style={{ color: '#3B71FE' }}>⭐</div>
+                                    {/* NOTE NHẬN DIỆN CHO NGÂN */}
+                                    <span className="card-badge" style={{ background: '#3B71FE', color: 'white' }}>Mới nhất</span>
+                                </div>
+                                <span className="card-company">{job.company_name || 'Công ty ẩn danh'}</span>
+                                <div className="card-title">{job.title}</div>
+                                <div className="card-tags">
+                                    <span className="mini-tag">{job.location}</span>
+                                    <span className="mini-tag">{job.experience}</span>
+                                </div>
+                                <div className="card-bottom">
+                                    <div className="price-tag">{job.salary}</div>
+                                    <div className="location-text">🕒 {new Date(job.created_at).toLocaleDateString('vi-VN')}</div>
+                                </div>
+                                <div className="btn-apply-hover">
+                                    {userRole === 'recruiter' ? 'Xem chi tiết' : 'Ứng tuyển ngay'}
+                                </div>
+                            </div>
+                        ))}
                         <div className="job-card bg-1" onClick={handleJobClick}>
                             <div className="card-top">
                                 <div className="card-icon-box" style={{ color: '#05CD99' }}>☕</div>
@@ -235,11 +335,14 @@ const FindJobPage = () => {
                             <span className="card-company">Highlands Coffee</span>
                             <div className="card-title">Cửa Hàng Trưởng (Store Manager)</div>
                             <div className="card-tags"><span className="mini-tag">Q.1, HCM</span><span className="mini-tag">1 Năm KN</span></div>
+
+                            {/* Phần Footer: Giá tiền & Thời gian */}
                             <div className="card-bottom">
                                 <div className="price-tag">15 - 20 Triệu</div>
                                 <div className="location-text">🕒 2 giờ trước</div>
                             </div>
-                            {/* --- ĐỔI CHỮ NÚT BẤM --- */}
+
+                            {/* Nút Hover hiện lên */}
                             <div className="btn-apply-hover">
                                 {userRole === 'recruiter' ? 'Xem chi tiết' : 'Ứng tuyển ngay'}
                             </div>

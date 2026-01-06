@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "multer": "^2.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-rnd": "^10.5.2",
     "react-router-dom": "^7.11.0"
   },
   "devDependencies": {

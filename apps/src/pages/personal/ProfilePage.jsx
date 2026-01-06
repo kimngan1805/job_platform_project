@@ -2,17 +2,51 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ProfilePage.css';
 
+// --- IMPORT CÁC COMPONENT CV MẪU ---
+// Lưu ý: Đảm bảo file nằm trong folder src/components/cv-templates/
+import CVTemplate1 from '../../components/cv-templates/CVTemplate1';
+import CVTemplate2 from '../../components/cv-templates/CVTemplate2';
+
 const ProfilePage = () => {
     const navigate = useNavigate();
 
     // --- STATE QUẢN LÝ ---
-    const [activeTab, setActiveTab] = useState('applications'); // Tab đang chọn
-    const [modalType, setModalType] = useState(null); // Modal: 'cv', 'feedback'
+    const [activeTab, setActiveTab] = useState('cvs'); // Mặc định vào tab CV
+    // modalType: 'cv', 'feedback', 'preview_harvard', 'preview_minimal'
+    const [modalType, setModalType] = useState(null); 
 
     // --- STATE USER & NAVBAR ---
     const [userRole, setUserRole] = useState('');
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const userRef = useRef(null);
+
+    // ================== STATE CHO CHAT (MỚI THÊM) ==================
+    const [activeChat, setActiveChat] = useState(1);
+    const [inputMsg, setInputMsg] = useState('');
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false); // Bảng icon
+    
+    // Refs cho input file ẩn
+    const fileInputRef = useRef(null);
+    const imageInputRef = useRef(null);
+
+    // Dữ liệu giả danh sách người chat
+    const chatList = [
+        { id: 1, name: 'Nguyễn Văn An', role: 'HR Manager @ Google', avatar: 'NA', lastMsg: 'Chào Ngân! Cảm ơn em đã quan tâm...', time: '09:30', unread: 0, online: true },
+        { id: 2, name: 'Trần Thị Bình', role: 'Recruiter @ FPT', avatar: 'TB', lastMsg: 'Em có thể gửi lại CV bản PDF không?', time: 'Hôm qua', unread: 2, online: false },
+        { id: 3, name: 'Lê Minh Cường', role: 'Talent Acquisition @ VNG', avatar: 'LC', lastMsg: 'Hẹn em phỏng vấn vào thứ 6 nhé.', time: '2 ngày', unread: 0, online: false },
+        { id: 4, name: 'Phạm Thu Dung', role: 'HR @ Shopee', avatar: 'PD', lastMsg: 'Em đã xem qua yêu cầu chưa?', time: '3 ngày', unread: 1, online: true },
+    ];
+
+    // Dữ liệu tin nhắn (Hỗ trợ type: text, image, file)
+    const [messages, setMessages] = useState([
+        { id: 1, sender: 'me', type: 'text', text: 'Xin chào anh/chị! Em là Ngân Kim.', time: '09:15' },
+        { id: 2, sender: 'me', type: 'text', text: 'Em xin gửi CV để anh/chị xem xét ạ!', time: '09:16' },
+        { id: 3, sender: 'other', type: 'text', text: 'Chào An! Cảm ơn em đã quan tâm. Anh đã nhận được CV nhé.', time: '09:30' },
+    ]);
+
+    // Icon mẫu
+    const emojis = ["😀", "😁", "😂", "🥰", "😎", "🤔", "👍", "👎", "🙏", "🔥", "🎉", "❤️", "💼", "📄", "✨"];
+    // ===============================================================
 
     // --- EFFECT: LẤY DATA & ANIMATION ---
     useEffect(() => {
@@ -43,12 +77,61 @@ const ProfilePage = () => {
         };
     }, []);
 
-    // --- LOGOUT ---
+    // --- HÀM LOGOUT ---
     const handleLogout = () => {
         if (window.confirm("Bạn có chắc muốn đăng xuất?")) {
             localStorage.removeItem('user_data');
             navigate('/login');
         }
+    };
+
+    // --- HÀM CHUYỂN SANG TRANG EDITOR ---
+    const handleSelectTemplate = (templateId) => {
+        setModalType(null);
+        console.log("Đang chuyển sang Editor với template:", templateId);
+        navigate('/cv-editor', { state: { templateId: templateId } });
+    };
+
+    // ================== HANDLERS CHAT (MỚI) ==================
+    
+    // 1. Gửi Text
+    const handleSendMessage = () => {
+        if (!inputMsg.trim()) return;
+        const newMsg = {
+            id: Date.now(),
+            sender: 'me',
+            type: 'text',
+            text: inputMsg,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages([...messages, newMsg]);
+        setInputMsg('');
+        setShowEmojiPicker(false);
+    };
+
+    // 2. Upload File/Ảnh
+    const handleFileUpload = (e, type) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Tạo URL ảo để hiển thị ảnh ngay (nếu là ảnh)
+        const content = type === 'image' ? URL.createObjectURL(file) : file.name;
+
+        const newMsg = {
+            id: Date.now(),
+            sender: 'me',
+            type: type, // 'image' hoặc 'file'
+            text: content, 
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setMessages([...messages, newMsg]);
+        e.target.value = null; // Reset input
+    };
+
+    // 3. Thêm Emoji
+    const addEmoji = (emoji) => {
+        setInputMsg(prev => prev + emoji);
     };
 
     return (
@@ -68,6 +151,20 @@ const ProfilePage = () => {
                         <a onClick={() => navigate('/find-jobs')}>Tìm Việc</a>
                         <a className="active">Hồ Sơ & CV</a>
                         <a onClick={() => navigate('/recruiter')}>Công Ty</a>
+                        
+                        {/* Tab Tin nhắn trên Navbar */}
+                        <a 
+                            onClick={() => setActiveTab('messages')} 
+                            style={{ position: 'relative', cursor: 'pointer', fontWeight: activeTab === 'messages' ? 'bold' : 'normal', color: activeTab === 'messages' ? '#667eea' : 'inherit' }}
+                        >
+                            Tin nhắn 
+                            {chatList.reduce((acc, curr) => acc + curr.unread, 0) > 0 && 
+                                <span style={{ position: 'absolute', top: '-5px', right: '-10px', background: 'red', color: 'white', fontSize: '9px', padding: '2px 5px', borderRadius: '50%' }}>
+                                    {chatList.reduce((acc, curr) => acc + curr.unread, 0)}
+                                </span>
+                            }
+                        </a>
+
                         <a onClick={() => navigate('/tools')}>Công Cụ</a>
                     </nav>
 
@@ -123,6 +220,18 @@ const ProfilePage = () => {
                             <span className="menu-icon">📄</span>
                             <span className="menu-label">Kho CV</span>
                         </div>
+                        
+                        {/* MỤC TIN NHẮN (MỚI) */}
+                        <div className={`menu-item ${activeTab === 'messages' ? 'active' : ''}`} onClick={() => setActiveTab('messages')}>
+                            <span className="menu-icon">💬</span>
+                            <span className="menu-label">Tin nhắn</span>
+                            {chatList.reduce((acc, curr) => acc + curr.unread, 0) > 0 && 
+                                <span className="menu-badge" style={{background: '#ef4444', color: 'white'}}>
+                                    {chatList.reduce((acc, curr) => acc + curr.unread, 0)}
+                                </span>
+                            }
+                        </div>
+
                         <div className={`menu-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
                             <span className="menu-icon">👤</span>
                             <span className="menu-label">Hồ sơ cá nhân</span>
@@ -231,7 +340,7 @@ const ProfilePage = () => {
                         </div>
                     )}
 
-                    {/* TAB 2: CV LIBRARY (ĐÃ CẬP NHẬT) */}
+                    {/* TAB 2: CV LIBRARY */}
                     {activeTab === 'cvs' && (
                         <div className="tab-content active">
                             <div className="content-header">
@@ -332,6 +441,8 @@ const ProfilePage = () => {
                                         <span className="view-all">Xem tất cả →</span>
                                     </div>
                                     <div className="template-grid">
+                                        
+                                        {/* CARD 1: HARVARD CLASSIC -> CVTemplate1 */}
                                         <div className="template-card">
                                             <div className="template-preview" style={{ background: '#ffffff', border: '1px solid #eee' }}>
                                                 <div className="preview-lines" style={{ opacity: 0.3, background: 'black' }}></div>
@@ -340,10 +451,16 @@ const ProfilePage = () => {
                                             <div className="template-info">
                                                 <h4>Harvard Classic</h4>
                                                 <p>Phù hợp: Fresher, Học bổng</p>
-                                                <button className="btn-use-template">Dùng mẫu này</button>
+                                                <button 
+                                                    className="btn-use-template"
+                                                    onClick={() => setModalType('preview_harvard')}
+                                                >
+                                                    Xem & Dùng mẫu
+                                                </button>
                                             </div>
                                         </div>
 
+                                        {/* CARD 2: MINIMAL GREY -> CVTemplate2 (Mẫu Adeline) */}
                                         <div className="template-card">
                                             <div className="template-preview" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
                                                 <div className="preview-lines" style={{ opacity: 0.4, background: '#475569' }}></div>
@@ -352,12 +469,183 @@ const ProfilePage = () => {
                                             <div className="template-info">
                                                 <h4>Minimal Grey</h4>
                                                 <p>Phù hợp: Quản lý, HR</p>
-                                                <button className="btn-use-template">Dùng mẫu này</button>
+                                                <button 
+                                                    className="btn-use-template"
+                                                    onClick={() => setModalType('preview_minimal')}
+                                                >
+                                                    Xem & Dùng mẫu
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ================= TAB: TIN NHẮN (FULL CHỨC NĂNG) ================= */}
+                    {activeTab === 'messages' && (
+                        <div className="tab-content active" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)', padding: 0, overflow: 'hidden' }}>
+                            <div className="chat-layout" style={{ display: 'flex', flex: 1, height: '100%', background: 'white', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                                
+                                {/* 1. DANH SÁCH CHAT */}
+                                <div className="chat-sidebar" style={{ width: '320px', borderRight: '1px solid #eee', display: 'flex', flexDirection: 'column' }}>
+                                    <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+                                        <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '15px' }}>Tin nhắn</h2>
+                                        <div style={{ position: 'relative' }}>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Tìm kiếm..." 
+                                                style={{ width: '100%', padding: '10px 15px 10px 35px', borderRadius: '20px', border: '1px solid #eee', background: '#f9f9f9', fontSize: '14px', outline: 'none' }} 
+                                            />
+                                            <span style={{ position: 'absolute', left: '12px', top: '10px', color: '#999' }}>🔍</span>
+                                        </div>
+                                    </div>
+                                    <div className="chat-list" style={{ flex: 1, overflowY: 'auto' }}>
+                                        {chatList.map(chat => (
+                                            <div 
+                                                key={chat.id} 
+                                                onClick={() => setActiveChat(chat.id)}
+                                                className={`chat-item ${activeChat === chat.id ? 'active' : ''}`}
+                                                style={{ 
+                                                    padding: '15px 20px', 
+                                                    display: 'flex', 
+                                                    gap: '12px', 
+                                                    cursor: 'pointer', 
+                                                    borderBottom: '1px solid #fcfcfc', 
+                                                    background: activeChat === chat.id ? '#f0f7ff' : 'white',
+                                                    borderLeft: activeChat === chat.id ? '4px solid #667eea' : '4px solid transparent',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                <div style={{ position: 'relative' }}>
+                                                    <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#667eea', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '16px' }}>{chat.avatar}</div>
+                                                    {chat.online && <div style={{ width: '12px', height: '12px', background: '#22c55e', borderRadius: '50%', border: '2px solid white', position: 'absolute', bottom: 0, right: 0 }}></div>}
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                        <span style={{ fontWeight: '600', fontSize: '14px', color: '#333' }}>{chat.name}</span>
+                                                        <span style={{ fontSize: '11px', color: '#999' }}>{chat.time}</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <p style={{ fontSize: '12px', color: chat.unread > 0 ? '#333' : '#666', fontWeight: chat.unread > 0 ? '600' : 'normal', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px', margin: 0 }}>{chat.lastMsg}</p>
+                                                        {chat.unread > 0 && <span style={{ background: '#ef4444', color: 'white', fontSize: '10px', fontWeight: 'bold', padding: '0 6px', borderRadius: '10px', height: '18px', display: 'flex', alignItems: 'center' }}>{chat.unread}</span>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 2. KHUNG CHAT */}
+                                <div className="chat-window" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                    {/* Header Chat */}
+                                    <div style={{ padding: '15px 20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#667eea', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>NA</div>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold', fontSize: '16px', color: '#333' }}>Nguyễn Văn An</div>
+                                                <div style={{ fontSize: '12px', color: '#22c55e' }}>● Đang hoạt động</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '20px', color: '#666', fontSize: '18px' }}>
+                                            <span style={{ cursor: 'pointer' }}>📞</span>
+                                            <span style={{ cursor: 'pointer' }}>📹</span>
+                                            <span style={{ cursor: 'pointer' }}>ℹ️</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Nội dung Chat (Scrollable) */}
+                                    <div className="chat-messages" style={{ flex: 1, padding: '20px', overflowY: 'auto', background: '#f9fafb', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                        <div style={{ textAlign: 'center', fontSize: '11px', color: '#999', margin: '10px 0' }}>Hôm nay - 05/01/2025</div>
+                                        
+                                        {messages.map(msg => (
+                                            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.sender === 'me' ? 'flex-end' : 'flex-start', maxWidth: '70%', alignSelf: msg.sender === 'me' ? 'flex-end' : 'flex-start' }}>
+                                                
+                                                {/* --- HIỂN THỊ TIN NHẮN THEO LOẠI --- */}
+                                                
+                                                {/* Loại 1: Text */}
+                                                {msg.type === 'text' && (
+                                                    <div style={{ background: msg.sender === 'me' ? '#667eea' : 'white', color: msg.sender === 'me' ? 'white' : '#333', padding: '12px 16px', borderRadius: msg.sender === 'me' ? '18px 18px 0 18px' : '18px 18px 18px 0', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', fontSize: '14px', lineHeight: '1.5' }}>
+                                                        {msg.text}
+                                                    </div>
+                                                )}
+
+                                                {/* Loại 2: Ảnh */}
+                                                {msg.type === 'image' && (
+                                                    <div style={{ background: 'transparent' }}>
+                                                        <img src={msg.text} alt="sent" style={{ maxWidth: '250px', borderRadius: '12px', border: '1px solid #eee', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }} />
+                                                    </div>
+                                                )}
+
+                                                {/* Loại 3: File */}
+                                                {msg.type === 'file' && (
+                                                    <div style={{ background: msg.sender === 'me' ? '#667eea' : 'white', color: msg.sender === 'me' ? 'white' : '#333', padding: '12px 16px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <span style={{ fontSize: '20px' }}>📄</span>
+                                                        <a href="#" style={{ color: 'inherit', textDecoration: 'underline', fontSize: '14px' }}>{msg.text}</a>
+                                                    </div>
+                                                )}
+
+                                                <span style={{ fontSize: '10px', color: '#999', marginTop: '4px', padding: '0 5px' }}>{msg.time}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Input Chat (Full Chức Năng) */}
+                                    <div style={{ padding: '20px', borderTop: '1px solid #eee', display: 'flex', gap: '12px', alignItems: 'center', background: 'white', position: 'relative' }}>
+                                        
+                                        {/* Nút Gửi File (Ghim) */}
+                                        <span onClick={() => fileInputRef.current.click()} style={{ cursor: 'pointer', fontSize: '22px', color: '#666', transition: 'color 0.2s' }} title="Đính kèm file" onMouseOver={(e) => e.target.style.color='#667eea'} onMouseOut={(e) => e.target.style.color='#666'}>📎</span>
+                                        <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'file')} style={{ display: 'none' }} />
+
+                                        {/* Nút Gửi Ảnh (Tranh) */}
+                                        <span onClick={() => imageInputRef.current.click()} style={{ cursor: 'pointer', fontSize: '22px', color: '#666', transition: 'color 0.2s' }} title="Gửi ảnh" onMouseOver={(e) => e.target.style.color='#667eea'} onMouseOut={(e) => e.target.style.color='#666'}>🖼️</span>
+                                        <input type="file" ref={imageInputRef} onChange={(e) => handleFileUpload(e, 'image')} accept="image/*" style={{ display: 'none' }} />
+
+                                        {/* Nút Gửi Icon (Mặt cười) */}
+                                        <div style={{ position: 'relative' }}>
+                                            <span onClick={() => setShowEmojiPicker(!showEmojiPicker)} style={{ cursor: 'pointer', fontSize: '22px', color: '#666', transition: 'color 0.2s' }} title="Chèn icon" onMouseOver={(e) => e.target.style.color='#667eea'} onMouseOut={(e) => e.target.style.color='#666'}>😊</span>
+                                            
+                                            {/* Bảng Emoji */}
+                                            {showEmojiPicker && (
+                                                <div style={{ position: 'absolute', bottom: '40px', left: '-10px', background: 'white', border: '1px solid #eee', borderRadius: '10px', padding: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '5px', width: '220px', zIndex: 100 }}>
+                                                    {emojis.map((emoji, index) => (
+                                                        <span 
+                                                            key={index} 
+                                                            onClick={() => addEmoji(emoji)} 
+                                                            style={{ cursor: 'pointer', fontSize: '20px', padding: '5px', textAlign: 'center', borderRadius: '5px', transition: 'background 0.2s' }}
+                                                            onMouseOver={(e) => e.target.style.background = '#f0f0f0'}
+                                                            onMouseOut={(e) => e.target.style.background = 'transparent'}
+                                                        >
+                                                            {emoji}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Ô nhập liệu */}
+                                        <div style={{ flex: 1, position: 'relative' }}>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Nhập tin nhắn..." 
+                                                value={inputMsg}
+                                                onChange={(e) => setInputMsg(e.target.value)}
+                                                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                                                style={{ width: '100%', padding: '12px 20px', borderRadius: '25px', border: '1px solid #ddd', outline: 'none', fontSize: '14px', background: '#f9f9f9' }} 
+                                            />
+                                        </div>
+                                        
+                                        {/* Nút Gửi */}
+                                        <button 
+                                            onClick={handleSendMessage}
+                                            style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#667eea', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 3px 10px rgba(102, 126, 234, 0.4)' }}
+                                        >
+                                            ➤
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -496,12 +784,22 @@ const ProfilePage = () => {
             {/* ================= MODALS (POPUP) ================= */}
             {modalType && (
                 <div className="modal-overlay" onClick={() => setModalType(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div 
+                        className="modal-content" 
+                        onClick={(e) => e.stopPropagation()}
+                        // Nếu là preview thì làm modal to ra
+                        style={(modalType === 'preview_harvard' || modalType === 'preview_minimal') ? { maxWidth: '900px', width: '90%' } : {}}
+                    >
                         <div className="modal-header">
-                            <h2>{modalType === 'cv' ? '📄 CV đã nộp' : '💬 Lịch sử & Feedback'}</h2>
+                            <h2>
+                                {modalType === 'cv' ? '📄 CV đã nộp' : 
+                                 modalType === 'feedback' ? '💬 Lịch sử & Feedback' :
+                                 '🎓 Xem trước mẫu CV'}
+                            </h2>
                             <span className="modal-close" onClick={() => setModalType(null)}>✕</span>
                         </div>
 
+                        {/* Modal xem CV đã nộp */}
                         {modalType === 'cv' && (
                             <div style={{ textAlign: 'center', padding: '20px' }}>
                                 <div style={{ height: '200px', background: '#f5f5f5', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
@@ -512,6 +810,7 @@ const ProfilePage = () => {
                             </div>
                         )}
 
+                        {/* Modal Feedback */}
                         {modalType === 'feedback' && (
                             <div className="feedback-timeline">
                                 <div className="timeline-item">
@@ -524,6 +823,59 @@ const ProfilePage = () => {
                                 </div>
                             </div>
                         )}
+
+                        {/* --- 3. MODAL PREVIEW HARVARD (Template 1) --- */}
+                        {modalType === 'preview_harvard' && (
+                            <div className="cv-preview-modal">
+                                <div style={{ 
+                                    maxHeight: '65vh', overflowY: 'auto', 
+                                    border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '20px',
+                                    background: '#525659', padding: '20px', display: 'flex', justifyContent: 'center'
+                                }}>
+                                    {/* Component hiển thị CV */}
+                                    <CVTemplate1 />
+                                </div>
+                                <div style={{ display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+                                    <button className="action-btn action-btn-secondary" onClick={() => setModalType(null)}>Đóng</button>
+                                    
+                                    {/* NÚT CHUYỂN SANG TRANG EDIT (ĐÃ GẮN SỰ KIỆN) */}
+                                    <button 
+                                        className="btn-add-item" 
+                                        style={{ width: 'auto' }}
+                                        onClick={() => handleSelectTemplate('harvard')}
+                                    >
+                                        🖊️ Dùng mẫu này
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* --- 4. MODAL PREVIEW MINIMAL (Template 2) --- */}
+                        {modalType === 'preview_minimal' && (
+                            <div className="cv-preview-modal">
+                                <div style={{ 
+                                    maxHeight: '65vh', overflowY: 'auto', 
+                                    border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '20px',
+                                    background: '#525659', padding: '20px', display: 'flex', justifyContent: 'center'
+                                }}>
+                                    {/* Component hiển thị CV 2 */}
+                                    <CVTemplate2 />
+                                </div>
+                                <div style={{ display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+                                    <button className="action-btn action-btn-secondary" onClick={() => setModalType(null)}>Đóng</button>
+                                    
+                                    {/* NÚT CHUYỂN SANG TRANG EDIT (ĐÃ GẮN SỰ KIỆN) */}
+                                    <button 
+                                        className="btn-add-item" 
+                                        style={{ width: 'auto' }}
+                                        onClick={() => handleSelectTemplate('minimal')}
+                                    >
+                                        🖊️ Dùng mẫu này
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             )}

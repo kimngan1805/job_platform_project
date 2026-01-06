@@ -5,6 +5,15 @@ import '../css/RecruiterPage.css';
 
 const RecruiterPage = () => {
     const navigate = useNavigate();
+    // THÊM ĐOẠN NÀY VÀO ĐÂY ĐỂ HẾT LỖI TRẮNG MÀN HÌNH
+    const inputStyle = {
+        width: '100%',
+        padding: '12px',
+        borderRadius: '8px',
+        border: '1px solid #ddd',
+        fontSize: '14px',
+        marginBottom: '5px'
+    };
 
     // ==================================================================
     // 1. LOGIC MỚI: CHECK ROLE (Thêm đoạn này)
@@ -59,10 +68,10 @@ const RecruiterPage = () => {
     ]);
 
     const handleLike = (id) => {
-        setPosts(posts.map(post => 
-            post.id === id 
-            ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 } 
-            : post
+        setPosts(posts.map(post =>
+            post.id === id
+                ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 }
+                : post
         ));
     };
     // ==================================================================
@@ -82,7 +91,84 @@ const RecruiterPage = () => {
         { sender: 'recruiter', text: 'Chào bạn! Chúng tôi đã xem qua CV của bạn và rất ấn tượng. Bạn có thể tham gia phỏng vấn vào thứ 5 tuần sau được không?', },
     ]);
     const chatMessagesEndRef = useRef(null);
+    // --- STATE QUẢN LÝ POPUP TẠO BÀI ĐĂNG ---
+    const [showPostJobModal, setShowPostJobModal] = useState(false);
+    const [jobForm, setJobForm] = useState({
+        title: '', salary: '', location: '', experience: '',
+        description: '', requirements: '', benefits: '', deadline: ''
+    });
 
+    const handleJobInputChange = (e) => {
+        const { name, value } = e.target;
+        setJobForm({ ...jobForm, [name]: value });
+    };
+
+    const handlePostJob = async (e) => {
+        e.preventDefault();
+
+        // 1. Lấy thông tin user từ localStorage để biết ai đang đăng bài
+        const savedData = localStorage.getItem('user_data');
+        const user = JSON.parse(savedData);
+
+        // 2. Chuẩn bị dữ liệu
+        const finalData = {
+            ...jobForm,
+            userId: user.id, // Gửi kèm ID user để backend tìm recruiter_id
+            benefits: jobForm.benefits.split(',').map(b => b.trim())
+        };
+
+        try {
+            // 3. Gửi dữ liệu lên Backend
+            const response = await fetch('http://localhost:5000/api/job-posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert("🎉 Đăng tin tuyển dụng thành công!");
+                setShowPostJobModal(false);
+                fetchRealJobs();
+                // Có thể thêm logic load lại danh sách bài đăng ở đây
+            } else {
+                alert("Lỗi: " + result.message);
+            }
+        } catch (err) {
+            console.error("Lỗi kết nối:", err);
+            alert("Không thể kết nối tới server!");
+        }
+    };
+
+
+
+    const [realJobs, setRealJobs] = useState([]); // Lưu bài từ database
+
+    const fetchRealJobs = async () => {
+    const savedData = localStorage.getItem('user_data');
+    if (!savedData) return;
+    const user = JSON.parse(savedData);
+    
+    try {
+        const res = await fetch(`http://localhost:5000/api/job-posts/${user.id}`);
+        
+        // Kiểm tra nếu response không ok (như 404, 500)
+        if (!res.ok) {
+            const errorText = await res.text(); // Lấy nội dung lỗi dạng text
+            throw new Error(`Server báo lỗi: ${res.status}`);
+        }
+
+        const result = await res.json();
+        if (result.success) {
+            setRealJobs(result.data);
+        }
+    } catch (err) { 
+        console.error("Lỗi load job của Ngân:", err.message); 
+    }
+};
+
+    useEffect(() => { fetchRealJobs(); }, []); // Load ngay khi vào trang
     const openFolder = (folderName, count) => { setSelectedFolder({ name: folderName, count }); setActiveView('applications'); setShowAiResults(false); };
     const closeFolder = () => { setActiveView('folders'); };
     const handleAnalyzeApplications = () => { setAnalyzing(true); setTimeout(() => { setAnalyzing(false); setShowAiResults(true); }, 2000); };
@@ -102,27 +188,75 @@ const RecruiterPage = () => {
 
 
     // ==================================================================
-    // 3. GIAO DIỆN RIÊNG CHO ỨNG VIÊN (CANDIDATE)
+    // 3. GIAO DIỆN RIÊNG CHO ỨNG VIÊN (CANDIDATE) - ĐÃ CÓ NAVBAR XỊN
     // ==================================================================
     if (userRole === 'candidate') {
         return (
             <div style={{ background: '#F4F7FD', minHeight: '100vh', fontFamily: 'Segoe UI' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
-                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3B71FE', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }} onClick={() => navigate('/find-jobs')}>
-                        <span>⚡</span> Finder.
+
+                {/* --- NAVBAR MỚI (UPDATE THEO HÌNH) --- */}
+                <header style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0 40px',
+                    height: '70px',
+                    background: 'white',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1000
+                }}>
+                    {/* 1. Logo */}
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3B71FE', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => navigate('/find-jobs')}>
+                        <span style={{ fontSize: '28px' }}>⚡</span> Finder.
                     </div>
-                    <button onClick={() => navigate('/find-jobs')} style={{ padding: '10px 20px', border: 'none', background: '#F4F7FD', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', color: '#555' }}>
-                        ← Quay lại tìm việc
-                    </button>
+
+                    {/* 2. Menu Navigation (Đã sửa theo hình) */}
+                    <nav style={{ display: 'flex', gap: '40px' }}>
+                        <a onClick={() => navigate('/find-jobs')} style={{ cursor: 'pointer', fontWeight: '600', color: '#3B71FE', textDecoration: 'none', borderBottom: '2px solid #3B71FE', paddingBottom: '21px' }}>
+                            Tìm Việc
+                        </a>
+                        <a onClick={() => navigate('/profile-cv')} style={{ cursor: 'pointer', fontWeight: '500', color: '#6B7280', textDecoration: 'none', transition: '0.3s' }}
+                            onMouseOver={(e) => e.target.style.color = '#3B71FE'}
+                            onMouseOut={(e) => e.target.style.color = '#6B7280'}>
+                            Hồ Sơ & CV
+                        </a>
+                        <a onClick={() => alert('Chức năng Công ty')} style={{ cursor: 'pointer', fontWeight: '500', color: '#6B7280', textDecoration: 'none', transition: '0.3s' }}
+                            onMouseOver={(e) => e.target.style.color = '#3B71FE'}
+                            onMouseOut={(e) => e.target.style.color = '#6B7280'}>
+                            Công Ty
+                        </a>
+                        <a onClick={() => navigate('/tools')} style={{ cursor: 'pointer', fontWeight: '500', color: '#6B7280', textDecoration: 'none', transition: '0.3s' }}
+                            onMouseOver={(e) => e.target.style.color = '#3B71FE'}
+                            onMouseOut={(e) => e.target.style.color = '#6B7280'}>
+                            Công Cụ
+                        </a>
+                    </nav>
+
+                    {/* 3. User Actions (Giữ nguyên) */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <div style={{ position: 'relative', cursor: 'pointer' }}>
+                            <span style={{ fontSize: '20px' }}>🔔</span>
+                            <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#EF4444', color: 'white', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '5px 10px', borderRadius: '30px', background: '#F3F4F6', cursor: 'pointer' }}>
+                            <div style={{ width: '32px', height: '32px', background: '#3B71FE', borderRadius: '50%', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>
+                                N
+                            </div>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151', paddingRight: '5px' }}>Ngân</span>
+                        </div>
+                    </div>
                 </header>
 
+                {/* --- NỘI DUNG CHÍNH (GIỮ NGUYÊN) --- */}
                 <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px' }}>
-                    
-                    {/* SECTION 1: TOP COMPANIES GRID (GIỮ NGUYÊN CỦA VỢ) */}
+
+                    {/* SECTION 1: TOP COMPANIES GRID */}
                     <div style={{ textAlign: 'center', marginBottom: '60px' }}>
                         <h1 style={{ color: '#2A2E3B', fontSize: '32px', marginBottom: '10px' }}>Top Nhà Tuyển Dụng Hàng Đầu 🏆</h1>
                         <p style={{ color: '#7D8597', marginBottom: '40px' }}>Khám phá văn hóa và cơ hội nghề nghiệp tại các công ty công nghệ lớn nhất.</p>
-                        
+
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
                             {[
                                 { name: 'FPT Software', jobs: 12, icon: '💻' },
@@ -148,7 +282,7 @@ const RecruiterPage = () => {
                         </div>
                     </div>
 
-                    {/* SECTION 2: COMPANY FEED (MỚI THÊM VÀO ĐÂY NÈ) */}
+                    {/* SECTION 2: COMPANY FEED */}
                     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '30px', gap: '10px' }}>
                             <div style={{ height: '2px', width: '50px', background: '#E0E0E0' }}></div>
@@ -180,9 +314,9 @@ const RecruiterPage = () => {
 
                                 {/* Post Image */}
                                 <div style={{ width: '100%', height: '400px', overflow: 'hidden' }}>
-                                    <img src={post.image} alt="Post" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
-                                         onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
-                                         onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                                    <img src={post.image} alt="Post" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                                        onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+                                        onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                                     />
                                 </div>
 
@@ -190,7 +324,7 @@ const RecruiterPage = () => {
                                 <div style={{ padding: '15px 20px' }}>
                                     <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
                                         <button onClick={() => handleLike(post.id)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: post.isLiked ? '#ef4444' : '#374151', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            {post.isLiked ? '❤️' : '🤍'} 
+                                            {post.isLiked ? '❤️' : '🤍'}
                                         </button>
                                         <button style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer' }}>💬</button>
                                         <button style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer' }}>🚀</button>
@@ -289,15 +423,92 @@ const RecruiterPage = () => {
                             <div id="folders-view">
                                 <div className="page-title">
                                     <span>Quản lý hồ sơ ứng viên</span>
-                                    <button
-                                        className="create-job-btn"
-                                        onClick={() => alert('Tạo công việc mới')}
-                                    >
-                                        <i className="fas fa-plus"></i> Tạo công việc mới
+                                    <button className="create-job-btn" onClick={() => setShowPostJobModal(true)}>
+                                        <i className="fas fa-plus"></i> Tạo bài đăng mới
                                     </button>
                                 </div>
+                                {/* --- POPUP TẠO BÀI ĐĂNG (BẢN CĂN GIỮA SIÊU ĐẸP) --- */}
+                                {showPostJobModal && (
+                                    <div style={{
+                                        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        zIndex: 9999, backdropFilter: 'blur(4px)'
+                                    }}>
+                                        <div style={{
+                                            background: 'white', width: '90%', maxWidth: '800px',
+                                            maxHeight: '90vh', borderRadius: '24px', overflowY: 'auto',
+                                            boxShadow: '0 20px 40px rgba(0,0,0,0.2)', position: 'relative'
+                                        }}>
+                                            {/* Header xịn xò */}
+                                            <div style={{
+                                                padding: '25px 30px', borderBottom: '1px solid #eee',
+                                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                                position: 'sticky', top: 0, background: 'white', zIndex: 10
+                                            }}>
+                                                <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '800', color: '#1A1C2E', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <span style={{ background: '#8B5CF6', padding: '8px', borderRadius: '12px', color: 'white' }}>⚡</span>
+                                                    Tạo Bài Đăng Tuyển Dụng Mới
+                                                </h3>
+                                                <button onClick={() => setShowPostJobModal(false)} style={{ border: 'none', background: '#F3F4F6', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '20px', color: '#6B7280' }}>×</button>
+                                            </div>
 
+                                            <form onSubmit={handlePostJob} style={{ padding: '30px', display: 'grid', gap: '20px' }}>
+                                                <div className="form-group">
+                                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block', color: '#4B5563' }}>Vị trí tuyển dụng *</label>
+                                                    <input name="title" required placeholder="VD: Senior React Developer" onChange={handleJobInputChange} style={inputStyle} />
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                                    <div className="form-group">
+                                                        <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Mức lương</label>
+                                                        <input name="salary" placeholder="VD: $2,000 - $3,500" onChange={handleJobInputChange} style={inputStyle} />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Kinh nghiệm</label>
+                                                        <input name="experience" placeholder="VD: 3 - 5 Năm" onChange={handleJobInputChange} style={inputStyle} />
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                                    <div className="form-group">
+                                                        <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Địa điểm</label>
+                                                        <input name="location" placeholder="VD: Quận 1, TP.HCM" onChange={handleJobInputChange} style={inputStyle} />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Hạn nộp hồ sơ *</label>
+                                                        <input type="date" name="deadline" required onChange={handleJobInputChange} style={inputStyle} />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Mô tả công việc *</label>
+                                                    <textarea name="description" rows="4" placeholder="Nhập các đầu việc chính..." onChange={handleJobInputChange} style={{ ...inputStyle, resize: 'none' }}></textarea>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Yêu cầu ứng viên *</label>
+                                                    <textarea name="requirements" rows="4" placeholder="Kỹ năng, bằng cấp cần thiết..." onChange={handleJobInputChange} style={{ ...inputStyle, resize: 'none' }}></textarea>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Quyền lợi (cách nhau bằng dấu phẩy)</label>
+                                                    <input name="benefits" placeholder="Lương tháng 13, Macbook, Bảo hiểm..." onChange={handleJobInputChange} style={inputStyle} />
+                                                </div>
+
+                                                <button type="submit" style={{
+                                                    marginTop: '10px', padding: '16px', borderRadius: '16px', border: 'none',
+                                                    background: 'linear-gradient(135deg, #8B5CF6 0%, #3B71FE 100%)',
+                                                    color: 'white', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer',
+                                                    boxShadow: '0 10px 20px rgba(139, 92, 246, 0.2)'
+                                                }}>
+                                                    ĐĂNG BÀI TUYỂN DỤNG NGAY 🚀
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="folders-grid">
+
                                     <div
                                         className="folder-card"
                                         onClick={() => openFolder('UI/UX Designer', 3)}
@@ -386,6 +597,78 @@ const RecruiterPage = () => {
                                         <h2 className="section-title">Công việc đã đăng</h2>
                                     </div>
                                     <div className="job-posts-grid">
+                                        {realJobs.map((job) => (
+                                            <div
+                                                className="job-post-card"
+                                                key={job.id}
+                                                style={{
+                                                    border: job.status === 'rejected' ? '1px solid #FCA5A5' : '1px solid #E5E7EB',
+                                                    position: 'relative',
+                                                    paddingBottom: job.status === 'rejected' ? '20px' : '15px' // Thêm chỗ cho lý do từ chối
+                                                }}
+                                            >
+                                                {/* Badge trạng thái dựa trên status từ Database */}
+                                                <span
+                                                    className={`job-status ${job.status}`}
+                                                    style={{
+                                                        background: job.status === 'approved' ? '#ECFDF5' : job.status === 'rejected' ? '#FEF2F2' : '#FFFBEB',
+                                                        color: job.status === 'approved' ? '#10B981' : job.status === 'rejected' ? '#EF4444' : '#F59E0B',
+                                                        padding: '4px 12px',
+                                                        borderRadius: '20px',
+                                                        fontSize: '11px',
+                                                        fontWeight: 'bold',
+                                                        position: 'absolute',
+                                                        top: '15px',
+                                                        right: '15px',
+                                                        border: `1px solid ${job.status === 'rejected' ? '#FCA5A5' : 'transparent'}`
+                                                    }}
+                                                >
+                                                    {job.status === 'approved' ? 'Đang tuyển' : job.status === 'rejected' ? 'Bị từ chối' : 'Chờ duyệt'}
+                                                </span>
+
+                                                <h3 className="job-post-title" style={{ marginTop: '10px', width: '75%', fontSize: '18px' }}>
+                                                    {job.title}
+                                                </h3>
+
+                                                <div className="job-post-info" style={{ color: '#6B7280', fontSize: '13px', margin: '10px 0' }}>
+                                                    <i className="fas fa-users"></i> 0/10 ứng viên
+                                                </div>
+
+                                                {/* Progress Bar - xám đi nếu bị từ chối */}
+                                                <div className="progress-bar" style={{ height: '6px', background: '#E5E7EB', borderRadius: '3px', overflow: 'hidden' }}>
+                                                    <div
+                                                        className="progress-fill"
+                                                        style={{
+                                                            width: '0%',
+                                                            height: '100%',
+                                                            background: job.status === 'approved' ? '#10B981' : '#CBD5E1'
+                                                        }}
+                                                    ></div>
+                                                </div>
+
+                                                {/* HIỂN THỊ LÝ DO TỪ CHỐI (Quan trọng nhất đây nè ck) */}
+                                                {job.status === 'rejected' && job.rejection_reason && (
+                                                    <div style={{
+                                                        marginTop: '15px',
+                                                        padding: '10px',
+                                                        background: '#FFF1F2',
+                                                        borderRadius: '8px',
+                                                        borderLeft: '4px solid #EF4444',
+                                                        fontSize: '13px',
+                                                        color: '#991B1B'
+                                                    }}>
+                                                        <strong>⚠️ Lý do:</strong> {job.rejection_reason}
+                                                    </div>
+                                                )}
+
+                                                {/* Tooltip khi hover (giữ nguyên logic của Ngân) */}
+                                                <div className="job-details-tooltip">
+                                                    <div className="tooltip-item"><strong>Lương:</strong> {job.salary}</div>
+                                                    <div className="tooltip-item"><strong>Địa điểm:</strong> {job.location}</div>
+                                                    <div className="tooltip-item"><strong>Hạn nộp:</strong> {new Date(job.deadline).toLocaleDateString('vi-VN')}</div>
+                                                </div>
+                                            </div>
+                                        ))}
                                         <div className="job-post-card">
                                             <span className="job-status active">Đang tuyển</span>
                                             <h3 className="job-post-title">UI/UX Designer</h3>

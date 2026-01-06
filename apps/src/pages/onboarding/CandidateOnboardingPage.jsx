@@ -5,11 +5,38 @@ import './Onboarding.css';
 const CandidateOnboardingPage = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
+    
+    // --- State lưu dữ liệu (Cập nhật để map với API) ---
     const [skills, setSkills] = useState([]);
     const [salary, setSalary] = useState({ min: 10000000, max: 30000000 });
+    
+    // Các field khác
+    const [formData, setFormData] = useState({
+        desired_position: '',
+        current_level: 'Fresher / Mới ra trường',
+        interested_industries: [],
+        desired_location: 'Hồ Chí Minh',
+        work_types: ['Full-time'] // Mặc định
+    });
 
     const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
     const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
+
+    // Cập nhật form data
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Xử lý Checkbox (Ngành nghề, Hình thức làm việc)
+    const handleCheckboxChange = (field, item) => {
+        setFormData(prev => {
+            const list = prev[field].includes(item)
+                ? prev[field].filter(i => i !== item)
+                : [...prev[field], item];
+            return { ...prev, [field]: list };
+        });
+    };
 
     // Xử lý thêm kỹ năng bằng phím Enter
     const handleSkillKeyDown = (e) => {
@@ -27,10 +54,47 @@ const CandidateOnboardingPage = () => {
         setSkills(skills.filter(skill => skill !== skillToRemove));
     };
 
-    const handleSubmit = () => {
-        // Gửi API lưu thông tin ở đây
-        alert("🎉 Cập nhật hồ sơ thành công! Đang chuyển đến trang việc làm...");
-        navigate('/find-jobs'); // Chuyển về trang tìm việc
+    // --- HÀM SUBMIT GỌI API ---
+    const handleSubmit = async () => {
+        const userData = JSON.parse(localStorage.getItem('user_data'));
+        if (!userData || !userData.id) {
+            alert("Vui lòng đăng nhập lại!");
+            navigate('/login');
+            return;
+        }
+
+        try {
+            // Chuẩn bị payload
+            const payload = {
+                user_id: userData.id,
+                ...formData,
+                salary_min: salary.min,
+                salary_max: salary.max,
+                skills: skills
+            };
+
+            const response = await fetch('http://localhost:5000/api/onboarding/candidate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update role trong localStorage (dù đã set ở DB nhưng update ở đây để UI phản hồi ngay)
+                userData.role = 'candidate';
+                localStorage.setItem('user_data', JSON.stringify(userData));
+
+                alert("🎉 Cập nhật hồ sơ thành công! Đang chuyển đến trang việc làm...");
+                navigate('/find-jobs'); // Chuyển về trang tìm việc
+            } else {
+                alert("Lỗi: " + data.error);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối server!");
+        }
     };
 
     return (
@@ -71,11 +135,11 @@ const CandidateOnboardingPage = () => {
                             <h3 className="form-title">Bước 1: Định hướng nghề nghiệp</h3>
                             <div className="form-group">
                                 <label className="form-label">Vị trí mong muốn *</label>
-                                <input className="form-input" type="text" placeholder="Ví dụ: Frontend Developer" />
+                                <input className="form-input" type="text" name="desired_position" value={formData.desired_position} onChange={handleChange} placeholder="Ví dụ: Frontend Developer" />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Cấp bậc hiện tại *</label>
-                                <select className="form-select">
+                                <select className="form-select" name="current_level" value={formData.current_level} onChange={handleChange}>
                                     <option>Intern / Thực tập sinh</option>
                                     <option>Fresher / Mới ra trường</option>
                                     <option>Junior</option>
@@ -87,10 +151,15 @@ const CandidateOnboardingPage = () => {
                             <div className="form-group">
                                 <label className="form-label">Ngành nghề quan tâm</label>
                                 <div className="checkbox-grid">
-                                    <label className="checkbox-item"><input type="checkbox" /> IT - Phần mềm</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Marketing / PR</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Kinh doanh / Sale</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Thiết kế / Sáng tạo</label>
+                                    {['IT - Phần mềm', 'Marketing / PR', 'Kinh doanh / Sale', 'Thiết kế / Sáng tạo'].map(ind => (
+                                        <label key={ind} className="checkbox-item">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={formData.interested_industries.includes(ind)}
+                                                onChange={() => handleCheckboxChange('interested_industries', ind)}
+                                            /> {ind}
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -102,7 +171,7 @@ const CandidateOnboardingPage = () => {
                             <h3 className="form-title">Bước 2: Nhu cầu & Mong muốn</h3>
                             <div className="form-group">
                                 <label className="form-label">Địa điểm làm việc mong muốn</label>
-                                <select className="form-select">
+                                <select className="form-select" name="desired_location" value={formData.desired_location} onChange={handleChange}>
                                     <option>Hồ Chí Minh</option>
                                     <option>Hà Nội</option>
                                     <option>Đà Nẵng</option>
@@ -120,10 +189,15 @@ const CandidateOnboardingPage = () => {
                             <div className="form-group">
                                 <label className="form-label">Hình thức làm việc</label>
                                 <div className="checkbox-grid">
-                                    <label className="checkbox-item"><input type="checkbox" defaultChecked /> Full-time</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Part-time</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Freelance</label>
-                                    <label className="checkbox-item"><input type="checkbox" /> Remote</label>
+                                    {['Full-time', 'Part-time', 'Freelance', 'Remote'].map(type => (
+                                        <label key={type} className="checkbox-item">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={formData.work_types.includes(type)}
+                                                onChange={() => handleCheckboxChange('work_types', type)}
+                                            /> {type}
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
                         </div>

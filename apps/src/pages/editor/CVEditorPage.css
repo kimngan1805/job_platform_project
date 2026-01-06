@@ -1,0 +1,45 @@
+/* Import font chữ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Brush+Script+MT&display=swap');
+
+.font-brush { font-family: 'Brush Script MT', cursive; }
+
+/* Ẩn thanh cuộn */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Style cho thanh trượt Zoom */
+input[type=range] { accent-color: #6366F1; cursor: pointer; }
+
+/* --- SIDEBAR MỚI (LIGHT THEME) --- */
+.sidebar-item {
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    border-radius: 12px; /* Bo góc mềm mại hơn */
+}
+
+/* Hiệu ứng khi active (đang chọn) */
+.sidebar-item.active {
+    background-color: #EEF2FF; /* Màu nền xanh tím nhạt */
+    color: #4F46E5; /* Màu chữ xanh tím đậm */
+}
+
+/* Thanh chỉ báo nhỏ bên cạnh khi active */
+.sidebar-item.active::before {
+    content: '';
+    position: absolute;
+    left: -12px; /* Đẩy ra sát mép trái màn hình */
+    top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    width: 4px;
+    background-color: #4F46E5;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Animation trượt Drawer */
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-right { animation: slideInLeft 0.2s ease-out forwards; }

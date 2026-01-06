@@ -23,7 +23,7 @@ import RoleSelectionPage from './pages/RoleSelectionPage';
 import CandidateOnboardingPage from './pages/onboarding/CandidateOnboardingPage';
 import RecruiterOnboardingPage from './pages/onboarding/RecruiterOnboardingPage';
 
-
+import CVEditorPage from './pages/editor/CVEditorPage';
 import ProfilePage from './pages/personal/ProfilePage';
 
 function App() {
@@ -43,6 +43,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/find-jobs" element={<FindJobPage />} />
         <Route path="/job-detail" element={<JobDetailPage />} />
+        <Route path="/job-detail/:id" element={<JobDetailPage />} />
 
         {/* Recruiter Routes */}
         <Route path="/recruiter" element={<RecruiterPage />} />
@@ -51,6 +52,7 @@ function App() {
         <Route path="/recruiter/statistics" element={<StatisticsPage />} />
         <Route path="/recruiter/settings" element={<SettingsPage />} />
         <Route path="/profile-cv" element={<ProfilePage />} />
+        <Route path="/cv-editor" element={<CVEditorPage />} />
       </Routes>
     </BrowserRouter>
   )
